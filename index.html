@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#7d1022">
+<title>Manisha weds Atul</title>
+<meta name="color-scheme" content="light">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&family=Mukta:wght@400;600&family=Tiro+Devanagari+Hindi&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+
+<input class="rl" type="radio" name="lang" id="r-hi" checked aria-label="हिन्दी">
+<input class="rl" type="radio" name="lang" id="r-en" aria-label="English">
+<div class="lang" role="group" aria-label="Language">
+  <label for="r-hi" class="lb-hi">हिन्दी</label>
+  <label for="r-en" class="lb-en">English</label>
+</div>
+
+<main class="card">
+  <header class="cover" id="top">
+    <div class="in">
+      <svg class="gn" width="44" height="44" viewBox="0 0 100 100" fill="none" stroke="#b8892e" stroke-width="3" stroke-linecap="round"><path d="M38 22Q50 8 62 22"/><path d="M36 24Q14 20 14 46Q16 62 34 58"/><path d="M64 24Q86 20 86 46Q84 62 66 58"/><path d="M36 24Q50 14 64 24Q68 44 58 56Q56 74 62 84Q66 92 56 90"/><path d="M36 24Q32 44 42 56Q44 74 38 84"/><path d="M42 34Q45 31 48 34"/><path d="M52 34Q55 31 58 34"/></svg>
+      <p class="guest" id="guest-line" hidden><span class="hi">आदरणीय <b class="gname"></b>, आप सादर आमंत्रित हैं</span><span class="en">Dear <b class="gname"></b>, you are warmly invited</span></p>
+      <p class="inv"><span class="nw">॥ श्री गुरु देवाय नमः ॥</span> <span class="nw">॥ श्री गणेशाय नमः ॥</span> <span class="nw">॥ श्री श्याम देवाय नमः ॥</span></p>
+      <p class="shloka">ॐ वक्रतुण्ड महाकाय सूर्यकोटि समप्रभः।<br>निर्विघ्नं कुरु मे देव सर्वकार्येषु सर्वदा॥</p>
+      <h1 class="names"><span class="hi">मनीषा<small>संग</small>अतुल</span><span class="en">Manisha<small>weds</small>Atul</span></h1>
+      <p class="when"><span class="hi">16 नवंबर 2026</span><span class="en">16 November 2026</span><span class="l"><i class="hi" style="font-style:normal">विवाह निमंत्रण</i><i class="en" style="font-style:normal">Wedding Invitation</i></span></p>
+    </div>
+    <a class="cue" href="#blessing"><span class="hi">नीचे देखें</span><span class="en">Scroll</span></a>
+  </header>
+
+  <section class="sec" id="blessing">
+    <canvas id="pcv" aria-hidden="true"></canvas>
+    <div class="eyebrow"><span class="hi">शुभ आमंत्रण</span><span class="en">With Joy We Invite You</span></div>
+    <div class="hi">
+      <p class="bless">परम पूज्य गुरुदेव स्वामी श्री सत्य प्रकाशानंद जी सरस्वती के आशीर्वाद से<b class="host">श्रीमती मंजू एवं श्री पवन शारदा अपनी सुपुत्री</b></p>
+      <div class="pair"><p class="nm">आयुष्मति: मनीषा</p><p class="sub">(सुपौत्री: स्व. श्रीमती राधा देवी एवं स्व. श्री नवल किशोर शारदा)</p>
+        <p class="and">संग</p>
+        <p class="nm">आयुष्मान: अतुल</p><p class="sub">(सुपुत्र: श्रीमती उषा रानी एवं श्री विजय कपूर)</p></div>
+      <p class="ceremony">के परिणय सूत्र-बन्धन</p>
+      <p class="invite">की मांगलिक शुभ बेला पर आपको सादर आमंत्रित करते हैं।</p>
+    </div>
+    <div class="en">
+      <p class="bless">With the blessings of<br>Param Pujya Gurudev Swami Shri Satya Prakashanand Ji Saraswati<b class="host">Mrs. Manju &amp; Mr. Pawan Sharda</b>request the honour of your presence at the wedding of their daughter</p>
+      <div class="pair"><p class="nm">Manisha</p><p class="sub">Granddaughter of Late Smt. Radha Devi &amp; Late Sh. Nawal Kishor Sharda</p>
+        <p class="and">with</p>
+        <p class="nm">Atul</p><p class="sub">Son of Smt. Usha Rani &amp; Sh. Vijay Kapoor</p></div>
+      <p class="ceremony">Wedding Ceremony</p>
+      <p class="invite">We seek your blessings and gracious presence.</p>
+    </div>
+    <div class="shower">
+      <button type="button" class="bt" id="pushp-btn"><span class="hi">🌸 पुष्प वर्षा करें</span><span class="en">🌸 Shower Pushp Varsha</span></button>
+      <p class="pcount"><span class="hi">आशीर्वाद की पुष्प वर्षा: <b class="pv-n">0</b></span><span class="en">Petal showers sent: <b class="pv-n">0</b></span></p>
+    </div>
+    <div class="orn"><i></i></div>
+  </section>
+
+
+  <section class="sec" id="countdown">
+    <div class="eyebrow"><span class="hi cd-js">शुभ विवाह में शेष</span><span class="en cd-js">Counting Down To</span><span class="hi cd-no">शुभ तिथि</span><span class="en cd-no">Save the Date</span></div>
+    <h2><span class="hi">16 नवंबर, रात्रि 8 बजे</span><span class="en">16 November, 8 PM</span></h2>
+    <div class="savedate"><b>16 · 11 · 2026</b><span><span class="hi">सोमवार · बारात रात्रि 8:00 बजे</span><span class="en">Monday · Barat 8:00 PM</span></span></div>
+    <div class="count" aria-live="off">
+      <div><b id="c-d">--</b><span class="hi">दिन</span><span class="en">Days</span></div>
+      <div><b id="c-h">--</b><span class="hi">घंटे</span><span class="en">Hours</span></div>
+      <div><b id="c-m">--</b><span class="hi">मिनट</span><span class="en">Mins</span></div>
+      <div><b id="c-s">--</b><span class="hi">सेकंड</span><span class="en">Secs</span></div>
+    </div>
+    <p class="countnote" id="c-note"></p>
+    <div class="calbox"><div class="cal" aria-label="November 2026"><div class="calh"><span class="hi">नवंबर 2026</span><span class="en">November 2026</span></div><div class="calw"><u class="hi">र</u><u class="hi">सो</u><u class="hi">मं</u><u class="hi">बु</u><u class="hi">गु</u><u class="hi">शु</u><u class="hi">श</u><u class="en">S</u><u class="en">M</u><u class="en">T</u><u class="en">W</u><u class="en">T</u><u class="en">F</u><u class="en">S</u></div><div class="calg"><b>1</b><b>2</b><b>3</b><b>4</b><b>5</b><b>6</b><b>7</b><b>8</b><b>9</b><b>10</b><b>11</b><b class="ev5">12</b><b class="ev5">13</b><b>14</b><b class="ev5">15</b><b class="ev6">16</b><b>17</b><b>18</b><b>19</b><b>20</b><b>21</b><b>22</b><b>23</b><b>24</b><b>25</b><b>26</b><b>27</b><b>28</b><b>29</b><b>30</b></div></div><div class="leg"><span><i class="d5"></i><span class="hi">उत्सव के दिन</span><span class="en">Celebration days</span></span><span><i class="d6"></i><span class="hi">विवाह</span><span class="en">Wedding</span></span></div>
+      <a class="btn" id="ics-btn" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Manisha+%26+Atul+Wedding&amp;dates=20261112%2F20261117&amp;details=Wedding+celebrations+of+Manisha+%26+Atul%2C+Amritsar.%0A%0A12+Nov%3A+Ganesh+Pooja+10%3A00+AM%2C+Bangles+Ceremony+4%3A00+PM%0A13+Nov%3A+Mehndi+12%3A00+PM%0A15+Nov%3A+Haldi+12%3A00+PM%2C+Ring+Ceremony+7%3A00+PM%2C+Sangeet+8%3A00+PM%0A16+Nov%3A+Chak+Bhath+12%3A00+PM%2C+Wedding+Barat+8%3A00+PM&amp;location=Freedom+Grand%2C+G+T+Road%2C+Opposite+Nexus+Mall%2C+Amritsar" target="_blank" rel="noopener"><span class="hi">📅 कैलेंडर में जोड़ें</span><span class="en">📅 Add to Calendar</span></a></div>
+  </section>
+
+  <section class="sec" id="events">
+    <div class="eyebrow"><span class="hi">चार दिन का उत्सव</span><span class="en">Four Days of Celebration</span></div>
+    <h2><span class="hi">कार्यक्रम</span><span class="en">The Ceremonies</span></h2>
+    <div class="orn"><i></i></div>
+    <ol class="tl">
+      <li class="day"><div class="date"><b>12</b><i><span class="hi">नवंबर</span><span class="en">Nov</span></i><em><span class="hi">गुरुवार</span><span class="en">Thu</span></em></div>
+        <div class="evs">
+          <div class="ev"><div class="tag"><span class="hi">प्रातः</span><span class="en">Morning</span></div><h3><span class="hi">गणेश पूजा</span><span class="en">Ganesh Pooja</span></h3><div class="t"><span class="hi">प्रातः 10:00 बजे</span><span class="en">10:00 AM</span></div></div>
+          <div class="ev"><div class="tag"><span class="hi">सायं</span><span class="en">Evening</span></div><h3><span class="hi">चूड़ी की रस्म</span><span class="en">Bangles Ceremony</span></h3><div class="t"><span class="hi">शाम 4 बजे से</span><span class="en">4 PM onwards</span></div></div>
+        <details class="dress"><summary><span class="hi">👗 वेशभूषा सुझाव</span><span class="en">👗 Dress code</span></summary><div class="db"><div class="hi"><p>गणेश पूजा एवं चूड़ी की रस्म के लिए पारंपरिक परिधान — सूट, साड़ी या कुर्ता-पायजामा। हल्के पेस्टल, पीले या हरे रंग सुंदर लगेंगे।</p></div><div class="en"><p>Traditional ethnic wear for the pooja and bangles ceremony — suits, sarees or kurta-pyjamas. Soft pastels, yellow or green look lovely.</p></div></div></details></div></li>
+      <li class="day"><div class="date"><b>13</b><i><span class="hi">नवंबर</span><span class="en">Nov</span></i><em><span class="hi">शुक्रवार</span><span class="en">Fri</span></em></div>
+        <div class="evs"><div class="ev"><div class="tag"><span class="hi">दोपहर</span><span class="en">Afternoon</span></div><h3><span class="hi">मेहंदी</span><span class="en">Mehndi</span></h3><div class="t"><span class="hi">दोपहर 12 बजे से</span><span class="en">12 PM onwards</span></div></div><details class="dress"><summary><span class="hi">👗 वेशभूषा सुझाव</span><span class="en">👗 Dress code</span></summary><div class="db"><div class="hi"><p>मेहंदी के लिए रंग-बिरंगे, आरामदायक वस्त्र — हरा, नारंगी या चटख प्रिंट। ढीली या छोटी आस्तीन मेहंदी लगवाने में सुविधाजनक रहती है।</p></div><div class="en"><p>Colourful, comfortable outfits — greens, oranges and bright prints. Loose or short sleeves make applying mehndi easier.</p></div></div></details></div></li>
+      <li class="day"><div class="date"><b>15</b><i><span class="hi">नवंबर</span><span class="en">Nov</span></i><em><span class="hi">रविवार</span><span class="en">Sun</span></em></div>
+        <div class="evs">
+          <div class="ev"><div class="tag"><span class="hi">दोपहर</span><span class="en">Afternoon</span></div><h3><span class="hi">हल्दी</span><span class="en">Haldi</span></h3><div class="t"><span class="hi">दोपहर 12 बजे से</span><span class="en">12 PM onwards</span></div></div>
+          <div class="ev"><div class="tag"><span class="hi">सायं</span><span class="en">Evening</span></div><h3><span class="hi">रिंग सेरेमनी</span><span class="en">Ring Ceremony</span></h3><div class="t"><span class="hi">सायं 7:00 बजे</span><span class="en">7:00 PM</span></div></div>
+          <div class="ev"><div class="tag"><span class="hi">रात्रि</span><span class="en">Night</span></div><h3><span class="hi">संगीत</span><span class="en">Sangeet</span></h3><div class="t"><span class="hi">रात्रि 8:00 बजे</span><span class="en">8:00 PM</span></div></div>
+        <details class="dress"><summary><span class="hi">👗 वेशभूषा सुझाव</span><span class="en">👗 Dress code</span></summary><div class="db"><div class="hi"><p><b>हल्दी:</b> पीले या सफ़ेद सूती वस्त्र पहनें, जिन पर दाग लगने की चिंता न हो।</p><p><b>रिंग सेरेमनी एवं संगीत:</b> उत्सवी और भव्य — लहंगा, साड़ी, शेरवानी या इंडो-वेस्टर्न। नृत्य के लिए आरामदायक जूते-चप्पल।</p></div><div class="en"><p><b>Haldi:</b> yellow or white cotton you won’t mind getting stained.</p><p><b>Ring Ceremony &amp; Sangeet:</b> festive and glamorous — lehenga, saree, sherwani or indo-western. Comfortable footwear for dancing.</p></div></div></details></div></li>
+      <li class="day main"><div class="date"><b>16</b><i><span class="hi">नवंबर</span><span class="en">Nov</span></i><em><span class="hi">सोमवार</span><span class="en">Mon</span></em></div>
+        <div class="evs">
+          <div class="ev"><div class="tag"><span class="hi">दोपहर</span><span class="en">Afternoon</span></div><h3><span class="hi">चाक भात</span><span class="en">Chak Bhath</span></h3><div class="t"><span class="hi">दोपहर 12:00 बजे</span><span class="en">12:00 PM</span></div></div>
+          <div class="ev"><div class="tag"><span class="hi">रात्रि</span><span class="en">Night</span></div><h3><span class="hi">शुभ विवाह</span><span class="en">Wedding</span></h3><div class="t"><span class="hi">बारात रात्रि 8:00 बजे</span><span class="en">Barat 8:00 PM</span></div></div>
+        <details class="dress"><summary><span class="hi">👗 वेशभूषा सुझाव</span><span class="en">👗 Dress code</span></summary><div class="db"><div class="hi"><p><b>चाक भात:</b> सरल पारंपरिक परिधान।</p><p><b>बारात एवं विवाह:</b> भव्य पारंपरिक वेशभूषा — रेशम, कढ़ाई और गहरे रत्न-रंग। कृपया पूरी तरह सफ़ेद या काले वस्त्रों से बचें।</p></div><div class="en"><p><b>Chak Bhath:</b> simple traditional wear.</p><p><b>Barat &amp; Wedding:</b> rich traditional attire — silks, embroidery and jewel tones. Please avoid all-white or all-black outfits.</p></div></div></details></div></li>
+    </ol>
+    <div class="wx"><div class="wxi" aria-hidden="true">🌤️</div><div>
+      <p class="wt"><span class="hi">नवंबर में अमृतसर का मौसम</span><span class="en">Amritsar in November</span></p>
+      <p><span class="hi">दिन सुहावने रहते हैं (लगभग 24–26°C), पर शाम और रात ठंडी होती है (लगभग 8–11°C)। शाम के कार्यक्रमों और खुले में होने वाली बारात के लिए शॉल या हल्की जैकेट साथ रखें। सुबह कभी-कभी धुंध हो सकती है, यात्रा में थोड़ा अतिरिक्त समय रखें।</span><span class="en">Days are pleasant (typically around 24–26°C) but evenings and nights turn cool (around 8–11°C). Carry a shawl or light jacket for the evening functions and the open-air Barat. Mornings can be hazy, so allow extra travel time.</span></p>
+    </div></div>
+  </section>
+
+  <section class="sec" id="rsvp">
+    <div class="eyebrow"><span class="hi">उपस्थिति सूचना</span><span class="en">RSVP</span></div>
+    <h2><span class="hi">कृपया अपनी उपस्थिति बताएँ</span><span class="en">Kindly Let Us Know</span></h2>
+    <div class="orn"><i></i></div>
+    <noscript><p class="hint"><span class="hi">RSVP के लिए कृपया जावास्क्रिप्ट चालू करें या नीचे दिए नंबरों पर संपर्क करें।</span><span class="en">Please enable JavaScript to RSVP, or call the numbers below.</span></p></noscript>
+    <form class="wiz" id="rv-form" novalidate>
+      <ol class="steps" id="wz-steps" aria-label="Progress">
+        <li class="on"><b>1</b><span class="hi">आप</span><span class="en">You</span></li>
+        <li><b>2</b><span class="hi">दिन</span><span class="en">Days</span></li>
+        <li><b>3</b><span class="hi">आगमन</span><span class="en">Arrival</span></li>
+        <li><b>4</b><span class="hi">पास</span><span class="en">Pass</span></li>
+      </ol>
+
+      <div class="pn on" id="rv-p1">
+        <label class="fl"><span class="hi">आपका नाम</span><span class="en">Your name</span><input type="text" id="rv-name" maxlength="60" autocomplete="name" data-name data-ph-hi="पूरा नाम" data-ph-en="Full name"></label>
+        <label class="fl"><span class="hi">मोबाइल / WhatsApp नंबर</span><span class="en">Mobile / WhatsApp number</span><input type="tel" id="rv-phone" inputmode="tel" maxlength="18" autocomplete="tel" data-ph-hi="10 अंकों का नंबर" data-ph-en="10-digit number"></label>
+        <div class="fl" role="radiogroup"><span class="hi">क्या आप पधारेंगे?</span><span class="en">Will you attend?</span>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="rv-att" value="yes"><span class="c"><span class="hi">✅ सहर्ष उपस्थित होंगे</span><span class="en">✅ Attending</span></span></label>
+            <label class="chip"><input type="radio" name="rv-att" value="no"><span class="c"><span class="hi">🙏 उपस्थित नहीं हो पाएँगे</span><span class="en">🙏 Not Attending</span></span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="pn" id="rv-p2">
+        <label class="fl"><span class="hi">कितने सदस्य आ रहे हैं?</span><span class="en">How many members are coming?</span>
+          <select id="rv-count"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="15+">15+</option></select></label>
+        <label class="fl" id="rv-countx-w" hidden><span class="hi">कुल संख्या लिखें (16 या अधिक)</span><span class="en">Exact number (16 or more)</span><input type="number" id="rv-countx" min="16" max="300" inputmode="numeric"></label>
+        <div class="fl"><span class="hi">किन दिनों में शामिल होंगे?</span><span class="en">Which days will you attend?</span>
+          <div class="days">
+            <label class="chip dchip"><input type="checkbox" name="rv-day" value="12"><span class="c"><b>12</b><span class="dn"><span class="hi">गणेश पूजा · चूड़ी की रस्म</span><span class="en">Ganesh Pooja · Bangles</span></span></span></label>
+            <label class="chip dchip"><input type="checkbox" name="rv-day" value="13"><span class="c"><b>13</b><span class="dn"><span class="hi">मेहंदी</span><span class="en">Mehndi</span></span></span></label>
+            <label class="chip dchip"><input type="checkbox" name="rv-day" value="15"><span class="c"><b>15</b><span class="dn"><span class="hi">हल्दी · रिंग सेरेमनी · संगीत</span><span class="en">Haldi · Ring · Sangeet</span></span></span></label>
+            <label class="chip dchip"><input type="checkbox" name="rv-day" value="16"><span class="c"><b>16</b><span class="dn"><span class="hi">चाक भात · बारात एवं विवाह</span><span class="en">Chak Bhath · Barat &amp; Wedding</span></span></span></label>
+          </div>
+          <button type="button" class="lk" id="rv-alldays"><span class="hi">सभी दिन चुनें</span><span class="en">Select all days</span></button>
+        </div>
+      </div>
+
+      <div class="pn" id="rv-p3">
+        <label class="fl"><span class="hi">आगमन की तिथि</span><span class="en">Arrival date</span>
+          <select id="rv-arr">
+            <option value="" data-t-hi="चुनें" data-t-en="Select">Select</option>
+            <option value="11" data-t-hi="11 नवंबर (बुध)" data-t-en="11 Nov (Wed)">11 Nov (Wed)</option>
+            <option value="12" data-t-hi="12 नवंबर (गुरु)" data-t-en="12 Nov (Thu)">12 Nov (Thu)</option>
+            <option value="13" data-t-hi="13 नवंबर (शुक्र)" data-t-en="13 Nov (Fri)">13 Nov (Fri)</option>
+            <option value="14" data-t-hi="14 नवंबर (शनि)" data-t-en="14 Nov (Sat)">14 Nov (Sat)</option>
+            <option value="15" data-t-hi="15 नवंबर (रवि)" data-t-en="15 Nov (Sun)">15 Nov (Sun)</option>
+            <option value="16" data-t-hi="16 नवंबर (सोम)" data-t-en="16 Nov (Mon)">16 Nov (Mon)</option>
+          </select></label>
+        <div class="fl" role="radiogroup"><span class="hi">आगमन का समय-खंड</span><span class="en">Arrival time slot</span>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="rv-slot" value="morning"><span class="c"><span class="hi">प्रातः <small>6–12</small></span><span class="en">Morning <small>6–12</small></span></span></label>
+            <label class="chip"><input type="radio" name="rv-slot" value="afternoon"><span class="c"><span class="hi">दोपहर <small>12–4</small></span><span class="en">Afternoon <small>12–4</small></span></span></label>
+            <label class="chip"><input type="radio" name="rv-slot" value="evening"><span class="c"><span class="hi">सायं <small>4–8</small></span><span class="en">Evening <small>4–8</small></span></span></label>
+            <label class="chip"><input type="radio" name="rv-slot" value="night"><span class="c"><span class="hi">रात्रि <small>8+</small></span><span class="en">Night <small>8+</small></span></span></label>
+          </div>
+        </div>
+        <label class="fl"><span class="hi">सटीक समय (यदि पता हो)</span><span class="en">Exact time (if known)</span><input type="time" id="rv-time"></label>
+        <div class="fl" role="radiogroup"><span class="hi">यात्रा का साधन</span><span class="en">Mode of travel</span>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="rv-mode" value="train"><span class="c"><span class="hi">🚆 रेल</span><span class="en">🚆 Train</span></span></label>
+            <label class="chip"><input type="radio" name="rv-mode" value="flight"><span class="c"><span class="hi">✈️ विमान</span><span class="en">✈️ Flight</span></span></label>
+            <label class="chip"><input type="radio" name="rv-mode" value="car"><span class="c"><span class="hi">🚗 कार</span><span class="en">🚗 Car</span></span></label>
+            <label class="chip"><input type="radio" name="rv-mode" value="bus"><span class="c"><span class="hi">🚌 बस</span><span class="en">🚌 Bus</span></span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="pn" id="rv-p4">
+        <p class="thx"><span class="hi">🎉 धन्यवाद! आपकी उपस्थिति दर्ज हो गई है।</span><span class="en">🎉 Thank you! Your RSVP is saved.</span></p>
+        <ul class="sum" id="rv-sum"></ul>
+        <div class="wag">
+          <p class="wt"><span class="hi">आधिकारिक विवाह WhatsApp समूह</span><span class="en">Official Wedding WhatsApp Group</span></p>
+          <p class="wd"><span class="hi">यात्रा, समय और ताज़ा जानकारी के लिए समूह से जुड़ें — केवल RSVP करने वाले मेहमानों के लिए।</span><span class="en">Join for travel, timings and live updates — exclusively for guests who have RSVP’d.</span></p>
+          <div class="fl"><span class="hi">आपके साथ कितने सदस्य समूह में जुड़ेंगे?</span><span class="en">How many from your party will join the group?</span>
+            <div class="stp"><button type="button" id="rv-gm" aria-label="Less">−</button><input type="number" id="rv-grp-n" min="1" max="15" inputmode="numeric" aria-label="Group members"><button type="button" id="rv-gp" aria-label="More">+</button></div>
+          </div>
+          <a class="bt wab" id="rv-grp-btn" target="_blank" rel="noopener"><span class="hi">💬 WhatsApp समूह से जुड़ें</span><span class="en">💬 Join the WhatsApp Group</span></a>
+        </div>
+        <div class="acts2">
+          <button type="button" class="bt" id="rv-pass-btn"><span class="hi">🎟️ VIP वेलकम पास डाउनलोड करें (PNG)</span><span class="en">🎟️ Download VIP Welcome Pass (PNG)</span></button>
+          <a class="bt alt" id="rv-send" target="_blank" rel="noopener"><span class="hi">📲 RSVP होस्ट को WhatsApp पर भेजें</span><span class="en">📲 Send RSVP to host on WhatsApp</span></a>
+        </div>
+        <div class="passprev" id="rv-prev" hidden><img id="rv-pass-img" alt="VIP Welcome Pass"><p class="hint"><span class="hi">डाउनलोड न हो तो तस्वीर को दबाकर रखें और सेव करें।</span><span class="en">If the download doesn’t start, long-press the image to save it.</span></p></div>
+      </div>
+
+      <p class="err" id="rv-err" role="alert"></p>
+      <div class="wnav">
+        <button type="button" class="bt alt" id="rv-back" hidden><span class="hi">← पीछे</span><span class="en">← Back</span></button>
+        <button type="button" class="bt" id="rv-next"><span class="n1"><span class="hi">आगे बढ़ें →</span><span class="en">Next →</span></span><span class="n3"><span class="hi">उपस्थिति पक्की करें ✓</span><span class="en">Confirm RSVP ✓</span></span></button>
+      </div>
+    </form>
+  </section>
+
+  <section class="sec" id="wishes">
+    <div class="eyebrow"><span class="hi">शुभकामनाएँ</span><span class="en">Guestbook</span></div>
+    <h2><span class="hi">अपना आशीर्वाद भेजें</span><span class="en">Send Your Wishes</span></h2>
+    <div class="orn"><i></i></div>
+    <form class="wiz" id="wh-form" novalidate>
+      <label class="fl"><span class="hi">आपका नाम</span><span class="en">Your name</span><input type="text" id="wh-name" maxlength="40" data-name autocomplete="name" data-ph-hi="नाम" data-ph-en="Name"></label>
+      <label class="fl"><span class="hi">शहर / रिश्ता</span><span class="en">City / relation</span><input type="text" id="wh-city" maxlength="40" data-ph-hi="जैसे: जयपुर · मामा जी" data-ph-en="e.g. Jaipur · Mama ji"></label>
+      <div class="fl" role="radiogroup"><span class="hi">आशीर्वाद चिह्न</span><span class="en">Blessing badge</span>
+        <div class="chips">
+          <label class="chip"><input type="radio" name="wh-b" value="ash" checked><span class="c"><span class="hi">🙏 आशीर्वाद</span><span class="en">🙏 Ashirwad</span></span></label>
+          <label class="chip"><input type="radio" name="wh-b" value="shub"><span class="c"><span class="hi">🌸 शुभकामनाएँ</span><span class="en">🌸 Best Wishes</span></span></label>
+          <label class="chip"><input type="radio" name="wh-b" value="love"><span class="c"><span class="hi">❤️ स्नेह</span><span class="en">❤️ With Love</span></span></label>
+          <label class="chip"><input type="radio" name="wh-b" value="bad"><span class="c"><span class="hi">🎉 बधाई</span><span class="en">🎉 Congratulations</span></span></label>
+        </div>
+      </div>
+      <div class="fl"><span class="hi">एक टैप में संदेश</span><span class="en">One-tap wishes</span>
+        <div class="chips presets">
+          <button type="button" class="pre" data-i="0"><span class="hi">बधाई</span><span class="en">Congratulations</span></button>
+          <button type="button" class="pre" data-i="1"><span class="hi">आशीर्वाद</span><span class="en">Blessings</span></button>
+          <button type="button" class="pre" data-i="2"><span class="hi">न आ पाने का खेद</span><span class="en">Can’t attend</span></button>
+          <button type="button" class="pre" data-i="3"><span class="hi">जल्द मिलेंगे</span><span class="en">See you soon</span></button>
+        </div>
+      </div>
+      <label class="fl"><span class="hi">आपका संदेश</span><span class="en">Your message</span><textarea id="wh-msg" rows="4" maxlength="240" data-ph-hi="मनीषा और अतुल के लिए अपना आशीर्वाद लिखें…" data-ph-en="Write your blessing for Manisha &amp; Atul…"></textarea></label>
+      <p class="err" id="wh-err" role="alert"></p>
+      <div class="wnav"><button type="submit" class="bt"><span class="hi">🙏 आशीर्वाद दें</span><span class="en">🙏 Post Blessing</span></button></div>
+      <a class="bt alt wshare" id="wh-share" target="_blank" rel="noopener" hidden><span class="hi">📲 परिवार को WhatsApp पर भी भेजें</span><span class="en">📲 Also send to the family on WhatsApp</span></a>
+    </form>
+    <div class="wall" id="wh-list"></div>
+    <p class="hint" id="wh-empty"><span class="hi">पहला आशीर्वाद आपका हो सकता है 🌸</span><span class="en">Be the first to bless the couple 🌸</span></p>
+    <p class="fine" id="wh-fine-local"><span class="hi">आपके संदेश इस उपकरण पर दिखते हैं; परिवार तक पहुँचाने के लिए WhatsApp बटन दबाएँ।</span><span class="en">Wishes show on this device; tap the WhatsApp button to send one to the family.</span></p>
+    <p class="fine" id="wh-fine-live" hidden><span class="hi">सभी मेहमानों के आशीर्वाद यहाँ सीधे (लाइव) दिखते हैं और परिवार के लिए सुरक्षित रहते हैं 🙏</span><span class="en">Every guest’s wishes appear here live and are saved for the family 🙏</span></p>
+  </section>
+
+
+  <section class="sec" id="venue">
+    <div class="eyebrow"><span class="hi">विवाह स्थल</span><span class="en">Wedding Venue</span></div>
+    <h2><span class="hi">आपकी प्रतीक्षा में</span><span class="en">Where We Gather</span></h2>
+    <div class="venue">
+      <p class="nm">Freedom Grand</p>
+      <p>G T Road, Opposite Nexus Mall,<br>Amritsar</p>
+      <p class="hi" style="color:var(--soft);font-size:15px">जी टी रोड, नेक्सस मॉल के सामने, अमृतसर</p>
+      <div class="vbtns">
+        <a class="btn" href="https://www.google.com/maps/search/?api=1&amp;query=Freedom+Grand+G+T+Road+Opposite+Nexus+Mall+Amritsar" target="_blank" rel="noopener"><span class="hi">मैप में खोलें</span><span class="en">Open in Maps</span></a>
+        <button type="button" class="btn alt" id="copy-addr"><span class="hi">पता कॉपी करें</span><span class="en">Copy Address</span></button>
+      </div>
+      <ul class="trav">
+        <li><span class="ti" aria-hidden="true">✈️</span><span class="tt"><b><span class="hi">हवाई अड्डा</span><span class="en">Airport</span></b><small><span class="hi">श्री गुरु रामदास जी अंतरराष्ट्रीय · लगभग 18 किमी · ~40 मिनट</span><span class="en">Sri Guru Ram Dass Jee Intl. · approx. 18 km · ~40 min</span></small></span><a class="tl2" href="https://www.google.com/maps/dir/?api=1&amp;origin=Sri+Guru+Ram+Dass+Jee+International+Airport+Amritsar&amp;destination=Freedom+Grand+G+T+Road+Opposite+Nexus+Mall+Amritsar" target="_blank" rel="noopener"><span class="hi">रास्ता</span><span class="en">Route</span></a></li>
+        <li><span class="ti" aria-hidden="true">🚆</span><span class="tt"><b><span class="hi">रेलवे स्टेशन</span><span class="en">Railway Station</span></b><small><span class="hi">अमृतसर जंक्शन · लगभग 6 किमी · ~20 मिनट</span><span class="en">Amritsar Junction · approx. 6 km · ~20 min</span></small></span><a class="tl2" href="https://www.google.com/maps/dir/?api=1&amp;origin=Amritsar+Junction+Railway+Station&amp;destination=Freedom+Grand+G+T+Road+Opposite+Nexus+Mall+Amritsar" target="_blank" rel="noopener"><span class="hi">रास्ता</span><span class="en">Route</span></a></li>
+      </ul>
+      <p class="fine"><span class="hi">दूरी/समय अनुमानित हैं; यातायात के अनुसार बदल सकते हैं।</span><span class="en">Distances and times are approximate and vary with traffic.</span></p>
+    </div>
+  </section>
+
+  <section class="sec" id="family">
+    <div class="eyebrow"><span class="hi">परिवारजन</span><span class="en">With Love From</span></div>
+    <h2><span class="hi">आपके स्वागत में</span><span class="en">Our Families</span></h2>
+    <div class="dirctl">
+      <div class="fchips">
+        <button type="button" class="fchip" data-f="all" aria-pressed="true"><span class="hi">सभी</span><span class="en">All</span></button>
+        <button type="button" class="fchip" data-f="0" aria-pressed="false"><span class="hi">उत्तराकांक्षी</span><span class="en">Eagerly Awaiting</span></button>
+        <button type="button" class="fchip" data-f="1" aria-pressed="false"><span class="hi">दर्शनाभिलाषी</span><span class="en">Longing to Greet You</span></button>
+        <button type="button" class="fchip" data-f="2" aria-pressed="false"><span class="hi">स्वागतकर्ता</span><span class="en">Welcomed By</span></button>
+        <button type="button" class="fchip" data-f="3" aria-pressed="false"><span class="hi">जंवाई पक्ष</span><span class="en">Jamai Paksh</span></button>
+      </div>
+    </div>
+    <div class="fam">
+      <div class="grp"><h3><span class="hi">उत्तराकांक्षी</span><span class="en">Eagerly Awaiting</span></h3><ul>
+        <li><span class="hi">विमला देवी</span><span class="en">Vimla Devi</span></li>
+        <li><span class="hi">सत्यनारायण-कृष्णा देवी</span><span class="en">Satyanarayan-Krishna Devi</span></li></ul></div>
+      <div class="grp"><h3><span class="hi">दर्शनाभिलाषी</span><span class="en">Longing to Greet You</span></h3><ul>
+        <li><span class="hi">हिमांशु</span><span class="en">Himanshu</span></li><li><span class="hi">पीयूष</span><span class="en">Piyush</span></li><li><span class="hi">ललित</span><span class="en">Lalit</span></li><li><span class="hi">योगेश</span><span class="en">Yogesh</span></li><li><span class="hi">यश</span><span class="en">Yash</span></li><li><span class="hi">मनोज</span><span class="en">Manoj</span></li></ul></div>
+      <div class="grp"><h3><span class="hi">स्वागतकर्ता</span><span class="en">Welcomed By</span></h3><ul>
+        <li><span class="hi">अरूण-शकुंतला</span><span class="en">Arun-Shakuntala</span></li><li><span class="hi">सुरेन्द्र-सुधा</span><span class="en">Surendra-Sudha</span></li><li><span class="hi">संजय-प्रमिला</span><span class="en">Sanjay-Pramila</span></li><li><span class="hi">प्रहलाद-राजश्री</span><span class="en">Prahlad-Rajshree</span></li><li><span class="hi">जितेन्द्र-वीणा</span><span class="en">Jitendra-Veena</span></li><li><span class="hi">विजय-रेखा</span><span class="en">Vijay-Rekha</span></li><li><span class="hi">सुनील-आरती</span><span class="en">Sunil-Aarti</span></li></ul></div>
+      <div class="grp"><h3><span class="hi">जंवाई पक्ष</span><span class="en">Jamai Paksh</span></h3><ul>
+        <li><span class="hi">स्व. दुर्गा देवी-सत्यनारायण जी झंवर</span><span class="en">Late Durga Devi-Satyanarayan Ji Jhanwar</span></li><li><span class="hi">सुमित्रा-सुभाष जी परवाल</span><span class="en">Sumitra-Subhash Ji Parwal</span></li><li><span class="hi">मीना-श्याम जी लढा</span><span class="en">Meena-Shyam Ji Ladha</span></li><li><span class="hi">रिंकू-घनश्याम जी कचोलिया</span><span class="en">Rinku-Ghanshyam Ji Kacholiya</span></li><li><span class="hi">भारती-हर्ष जी मेहरा</span><span class="en">Bharti-Harsh Ji Mehra</span></li><li><span class="hi">भावना-करण जी मेहता</span><span class="en">Bhawna-Karan Ji Mehta</span></li></ul></div>
+    </div>
+    <p class="hint" id="fam-none" hidden><span class="hi">कोई नाम नहीं मिला।</span><span class="en">No matching name found.</span></p>
+  </section>
+
+  <section class="sec" id="jukebox">
+    <div class="eyebrow"><span class="hi">15 नवंबर · संगीत</span><span class="en">15 Nov · Sangeet</span></div>
+    <h2><span class="hi">गीतों की फरमाइश</span><span class="en">Song Request Jukebox</span></h2>
+    <div class="orn"><i></i></div>
+    <form class="wiz" id="sg-form" novalidate>
+      <label class="fl"><span class="hi">गीत का नाम</span><span class="en">Song title</span><input type="text" id="sg-t" maxlength="60" data-ph-hi="जैसे: गल्लाँ गुडियाँ" data-ph-en="e.g. Gallan Goodiyaan"></label>
+      <label class="fl"><span class="hi">फिल्म / गायक (वैकल्पिक)</span><span class="en">Film / singer (optional)</span><input type="text" id="sg-a" maxlength="40"></label>
+      <label class="fl"><span class="hi">आपका नाम</span><span class="en">Your name</span><input type="text" id="sg-n" maxlength="30" data-name autocomplete="name"></label>
+      <p class="err" id="sg-err" role="alert"></p>
+      <div class="wnav"><button type="submit" class="bt"><span class="hi">🎵 फरमाइश जोड़ें</span><span class="en">🎵 Add Request</span></button></div>
+    </form>
+    <ol class="songs" id="sg-list"></ol>
+    <p class="hint" id="sg-empty"><span class="hi">अभी कोई फरमाइश नहीं — पहली आपकी हो!</span><span class="en">No requests yet — be the first!</span></p>
+    <p class="fine" id="sg-fine-local"><span class="hi">🔥 दबाकर अपना पसंदीदा गीत चुनें। सूची इस उपकरण पर सहेजी जाती है।</span><span class="en">Tap 🔥 to upvote a favourite. This list is saved on this device.</span></p>
+    <p class="fine" id="sg-fine-live" hidden><span class="hi">🔥 दबाकर अपना पसंदीदा गीत चुनें। सभी मेहमानों की फरमाइशें और वोट यहाँ लाइव दिखते हैं।</span><span class="en">Tap 🔥 to upvote a favourite. Every guest’s requests and votes show up here live.</span></p>
+  </section>
+
+
+  <section class="sec" id="contact">
+    <div class="eyebrow"><span class="hi">संपर्क</span><span class="en">Contact</span></div>
+    <h2><span class="hi">अधिक जानकारी के लिए</span><span class="en">For Any Questions</span></h2>
+    <div class="phones">
+      <div class="ph"><a class="num" href="tel:+919855582403">9855582403</a><span class="pa"><a class="call" href="tel:+919855582403" aria-label="Call 9855582403"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg></a><a class="wa" href="https://wa.me/919855582403" target="_blank" rel="noopener" aria-label="WhatsApp 9855582403"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3z"/><g transform="translate(7 7) scale(.42)"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></g></svg></a></span></div>
+      <div class="ph"><a class="num" href="tel:+919463255073">9463255073</a><span class="pa"><a class="call" href="tel:+919463255073" aria-label="Call 9463255073"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg></a><a class="wa" href="https://wa.me/919463255073" target="_blank" rel="noopener" aria-label="WhatsApp 9463255073"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3z"/><g transform="translate(7 7) scale(.42)"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></g></svg></a></span></div>
+      <div class="ph"><a class="num" href="tel:+917508535232">7508535232</a><span class="pa"><a class="call" href="tel:+917508535232" aria-label="Call 7508535232"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg></a><a class="wa" href="https://wa.me/917508535232" target="_blank" rel="noopener" aria-label="WhatsApp 7508535232"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3z"/><g transform="translate(7 7) scale(.42)"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></g></svg></a></span></div>
+      <div class="ph"><a class="num" href="tel:+919056678705">9056678705</a><span class="pa"><a class="call" href="tel:+919056678705" aria-label="Call 9056678705"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg></a><a class="wa" href="https://wa.me/919056678705" target="_blank" rel="noopener" aria-label="WhatsApp 9056678705"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3z"/><g transform="translate(7 7) scale(.42)"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></g></svg></a></span></div>
+    </div>
+  </section>
+
+  <section class="sec" id="diya">
+    <div class="eyebrow"><span class="hi">शुभ दीप</span><span class="en">A Little Ritual</span></div>
+    <h2><span class="hi">दीप प्रवाहित करें</span><span class="en">Float a Diya</span></h2>
+    <div class="orn"><i></i></div>
+    <p class="lead"><span class="hi">अपने नाम का दीप जलाएँ और उसे नीचे कमल-सरोवर पर तैरते देखें।</span><span class="en">Light a diya in your name and watch it drift across the lotus lake below.</span></p>
+    <form class="dform" id="dy-form" novalidate>
+      <input type="text" id="dy-name" maxlength="24" data-name autocomplete="name" data-ph-hi="आपका नाम" data-ph-en="Your name" aria-label="Name on the diya">
+      <button type="submit" class="bt"><span class="hi">🪔 दीप जलाएँ</span><span class="en">🪔 Float a Diya</span></button>
+    </form>
+  </section>
+
+  <section class="scene" aria-label="Closing">
+    <div class="lake" id="lake" aria-hidden="true"></div>
+    <p><span class="hi">आपकी उपस्थिति हमारे उत्सव को<br>और भी विशेष बनाएगी !</span><span class="en">Your presence will make<br>our celebration more special!</span></p>
+  </section>
+  <footer class="foot">Manisha <span aria-hidden="true">·</span> Atul <span aria-hidden="true">·</span> 16.11.2026</footer>
+</main>
+
+<canvas id="fx" aria-hidden="true"></canvas>
+<div class="ovl toast" id="toast" role="status" aria-live="polite"></div>
+<div class="ovl modal" id="admin" role="dialog" aria-modal="true" aria-labelledby="ad-title" hidden>
+  <div class="mbox">
+    <button type="button" class="mx" id="ad-close" aria-label="Close">×</button>
+    <h3 id="ad-title"><span class="hi">होस्ट पैनल</span><span class="en">Host Panel</span></h3>
+
+    <div id="ad-login">
+      <h4><span class="hi">सुरक्षा सत्यापन</span><span class="en">Host Passcode</span></h4>
+      <p class="fine"><span class="hi">RSVP और अतिथियों के संदेश देखने के लिए पासकोड दर्ज करें।</span><span class="en">Enter host passcode to view RSVPs and guest wishes.</span></p>
+      <label class="fl"><span class="hi">पासकोड</span><span class="en">Passcode</span><input type="password" id="ad-pwd" maxlength="40" placeholder="••••••••"></label>
+      <p class="err" id="ad-err" role="alert"></p>
+      <div class="mrow"><button type="button" class="bt sm" id="ad-unlock"><span class="hi">अनलॉक करें</span><span class="en">Unlock</span></button></div>
+    </div>
+
+    <div id="ad-body" hidden>
+      <h4><span class="hi">अतिथि निमंत्रण लिंक</span><span class="en">Personal invite link</span></h4>
+      <label class="fl"><span class="hi">अतिथि / परिवार का नाम</span><span class="en">Guest / family name</span><input type="text" id="ad-name" maxlength="60" data-ph-hi="जैसे: शर्मा परिवार" data-ph-en="e.g. Sharma Family"></label>
+      <input type="text" id="ad-link" class="mono" readonly aria-label="Invite link">
+      <div class="mrow"><button type="button" class="bt sm" id="ad-copy"><span class="hi">लिंक कॉपी करें</span><span class="en">Copy link</span></button><a class="bt sm alt" id="ad-wa" target="_blank" rel="noopener"><span class="hi">WhatsApp पर भेजें</span><span class="en">Share on WhatsApp</span></a></div>
+      <h4><span class="hi">RSVP सारांश</span><span class="en">RSVP summary</span></h4>
+      <div class="stats">
+        <div><b id="st-n">0</b><span class="hi">उत्तर</span><span class="en">Replies</span></div>
+        <div><b id="st-y">0</b><span class="hi">आ रहे</span><span class="en">Attending</span></div>
+        <div><b id="st-m">0</b><span class="hi">सदस्य</span><span class="en">Members</span></div>
+        <div><b id="st-g">0</b><span class="hi">WhatsApp समूह</span><span class="en">In group</span></div>
+      </div>
+      <ul class="adl" id="ad-list"></ul>
+      <p class="fine" id="ad-wlive" hidden><span class="hi">ये सभी मेहमानों के आंकड़े हैं (साझा Supabase डेटाबेस से)।</span><span class="en">These are live statistics from the shared Supabase database.</span></p>
+      <p class="fine" id="ad-wlocal"><span class="hi">ये आँकड़े केवल इसी उपकरण/ब्राउज़र के हैं।</span><span class="en">These counts come from this device/browser only.</span></p>
+      <button type="button" class="lk" id="ad-reset"><span class="hi">इस उपकरण का RSVP डेटा मिटाएँ</span><span class="en">Reset RSVP data on this device</span></button>
+      <h4><span class="hi">अतिथियों के आशीर्वाद</span><span class="en">Guest wishes</span> (<b id="ad-wcount">0</b>)</h4>
+      <div class="mrow"><button type="button" class="bt sm" id="ad-wcsv"><span class="hi">CSV डाउनलोड करें</span><span class="en">Download CSV</span></button><button type="button" class="bt sm alt" id="ad-wcopy"><span class="hi">सब कॉपी करें</span><span class="en">Copy all</span></button></div>
+      <ul class="adw" id="ad-wishes"></ul>
+      <div class="mrow" style="margin-top:16px"><button type="button" class="lk" id="ad-logout"><span class="hi">होस्ट पैनल लॉक करें</span><span class="en">Lock panel</span></button></div>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
