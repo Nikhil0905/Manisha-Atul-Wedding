@@ -1,0 +1,63 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "wishes": {
+      ".read": true,
+      ".indexOn": ["ts"],
+      "$id": {
+        ".write": "!data.exists() && newData.exists()",
+        ".validate": "newData.hasChildren(['n', 'm', 'ts', 'l'])",
+        "n":  { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 40" },
+        "c":  { ".validate": "newData.isString() && newData.val().length <= 40" },
+        "m":  { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 240" },
+        "b":  { ".validate": "newData.isString() && newData.val().length <= 6" },
+        "ts": { ".validate": "newData.isNumber() && newData.val() <= now" },
+        "l": {
+          ".write": "data.exists()",
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000"
+        },
+        "$other": { ".validate": false }
+      }
+    },
+
+    "diyas": {
+      ".read": true,
+      ".indexOn": ["ts"],
+      "$id": {
+        ".write": "!data.exists() && newData.exists()",
+        ".validate": "newData.hasChildren(['n', 'ts'])",
+        "n":  { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 24" },
+        "ts": { ".validate": "newData.isNumber() && newData.val() <= now" },
+        "$other": { ".validate": false }
+      }
+    },
+
+    "songs": {
+      ".read": true,
+      ".indexOn": ["ts"],
+      "$id": {
+        ".write": "!data.exists() && newData.exists()",
+        ".validate": "newData.hasChildren(['t', 'ts', 'v'])",
+        "t":  { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 60" },
+        "a":  { ".validate": "newData.isString() && newData.val().length <= 40" },
+        "by": { ".validate": "newData.isString() && newData.val().length <= 30" },
+        "ts": { ".validate": "newData.isNumber() && newData.val() <= now" },
+        "v": {
+          ".write": "data.exists()",
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000"
+        },
+        "$other": { ".validate": false }
+      }
+    },
+
+    "counters": {
+      ".read": true,
+      "pushp": {
+        ".write": "newData.isNumber() && newData.val() >= (data.exists() ? data.val() : 0) && newData.val() <= (data.exists() ? data.val() : 0) + 50",
+        ".validate": "newData.isNumber()"
+      }
+    }
+  }
+}
