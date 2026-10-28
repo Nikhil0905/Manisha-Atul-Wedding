@@ -91,5 +91,5 @@ Production-ready bilingual (Hindi / English) wedding invitation website built wi
 ## 🔐 Administrative Access
 To access the Host Panel:
 1. Triple-tap the footer at the bottom of the page (`Manisha · Atul · 16.11.2026`).
-2. Enter your host passcode: `Yogesh@2026`
+2. Enter your host passcode:
 3. Click **Unlock**.
