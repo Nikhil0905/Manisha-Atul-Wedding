@@ -12,8 +12,8 @@
 
 
 *{box-sizing:border-box}
-html{scroll-behavior:smooth;overflow-x:hidden;-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--stage);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.55;overflow-x:hidden;width:100%;max-width:100vw;
+html{scroll-behavior:smooth;overflow-x:clip;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--stage);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.55;overflow-x:clip;width:100%;max-width:100%;
   padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px))}
 .card{width:100%;max-width:480px;margin:0 auto;background:var(--paper);box-shadow:0 0 60px var(--shadow);overflow:hidden}
 h1,h2,h3,p{margin:0}
@@ -154,7 +154,7 @@ a{-webkit-tap-highlight-color:rgba(125,16,34,.15)}
 html.js .savedate{display:none}
 
 .nw{white-space:nowrap}
-.inv{white-space:nowrap;font-size:clamp(10px,2.95vw,14px)!important}
+.inv{white-space:normal;font-size:clamp(10px,2.95vw,14px)!important}
 .eyebrow .hi{font:700 16px/1.2 var(--deva);color:var(--gold)}
 .tag .hi{font:700 15px/1 var(--deva)}
 .date i .hi{font:700 14px/1.3 var(--deva)}
@@ -458,4 +458,8 @@ button.btn{border:0;cursor:pointer;-webkit-appearance:none;appearance:none}
   .dform .bt {
     width: 100%;
   }
+  /* Prevent any nowrap text from forcing the page wider than the viewport */
+  .nw { white-space: normal; }
+  .inv { white-space: normal !important; }
+  .cue { white-space: normal; text-align: center; max-width: calc(100% - 28px); }
 }
