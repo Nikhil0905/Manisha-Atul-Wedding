@@ -39,12 +39,13 @@
 /* =====================================================================
    INTERACTIVE FEATURES & SUPABASE INTEGRATION
    Backend: Supabase (PostgreSQL with Row Level Security & Realtime)
-   - RSVP: Stored privately in Supabase (max 3 records per phone number)
+   - Background Music Player with Mute Toggle & Tab Lifecycle
+   - RSVP: Stored privately in Supabase (max 3 records per phone number, upsert support)
    - Pushp Varsha: Atomic shared counter with realtime updates
    - Song Jukebox: Public song requests with upvoting & realtime ranking
    - Floating Diyas: Public lake drift with realtime broadcast
    - Guestbook / Wishes: Stored in Supabase with realtime public sync
-   - Host Panel: Protected by host authentication (passcode); live RSVP/Wishes export
+   - Host Panel: Protected by host authentication; live RSVP/Wishes export with Excel CSV
    ===================================================================== */
 (function(){
   'use strict';
@@ -130,6 +131,89 @@
   function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
   var reduce=false;try{reduce=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(e){}
   function smoothTo(node,block){try{node.scrollIntoView({behavior:reduce?'auto':'smooth',block:block||'start'})}catch(e){node.scrollIntoView()}}
+
+  /* ---- background music player ---- */
+  (function(){
+    var audio=$('bg-music'), musicBtn=$('music-btn'), mIcon=$('m-icon');
+    if(!audio)return;
+
+    // Default volume: medium-low (0.25)
+    audio.volume = 0.25;
+
+    // Glitch skip (03:12 – 03:34): if between 191.5s and 215s, jump directly to 215s
+    audio.addEventListener('timeupdate', function(){
+      if(audio.currentTime >= 191.5 && audio.currentTime < 215){
+        audio.currentTime = 215;
+      }
+    });
+
+    var isMuted = sessionStorage.getItem('wd-music-mute') === 'true';
+
+    function updateMusicUI(playing){
+      if(!musicBtn) return;
+      var active = playing && !isMuted;
+      musicBtn.classList.toggle('muted', !active);
+      if(mIcon) mIcon.textContent = active ? '🔊' : '🔇';
+      var onText = q('.on-text', musicBtn), offText = q('.off-text', musicBtn);
+      if(onText) onText.hidden = !active;
+      if(offText) offText.hidden = active;
+      musicBtn.setAttribute('aria-label', active ? 'Mute background music' : 'Play background music');
+    }
+
+    function playMusic(){
+      if(!audio || isMuted) return;
+      var p = audio.play();
+      if(p && p.then){
+        p.then(function(){ updateMusicUI(true); }).catch(function(){ updateMusicUI(false); });
+      }
+    }
+
+    function pauseMusic(){
+      if(audio){ audio.pause(); updateMusicUI(false); }
+    }
+
+    // Autoplay attempt on load & first-interaction unlock
+    if(!isMuted){
+      playMusic();
+      var unlockAudio = function(){
+        if(!isMuted && audio && audio.paused){
+          playMusic();
+        }
+      };
+      ['pointerdown', 'touchstart', 'click', 'keydown'].forEach(function(evt){
+        DOC.addEventListener(evt, unlockAudio, { once: true, passive: true });
+      });
+    } else {
+      updateMusicUI(false);
+    }
+
+    // Active webapp lifecycle (pause on tab switch / lock, resume on return)
+    DOC.addEventListener('visibilitychange', function(){
+      if(DOC.hidden){
+        if(audio && !audio.paused) audio.pause();
+      } else {
+        if(!isMuted && audio && audio.paused) playMusic();
+      }
+    });
+    window.addEventListener('pagehide', function(){
+      if(audio && !audio.paused) audio.pause();
+    });
+
+    // Top toggle button
+    if(musicBtn){
+      musicBtn.addEventListener('click', function(){
+        if(isMuted){
+          isMuted = false;
+          sessionStorage.setItem('wd-music-mute', 'false');
+          playMusic();
+        } else {
+          isMuted = true;
+          sessionStorage.setItem('wd-music-mute', 'true');
+          pauseMusic();
+        }
+      });
+    }
+  })();
 
   /* ---- accessible unified modal manager ---- */
   var MODAL=(function(){
@@ -313,7 +397,7 @@
     });
   })();
 
-  /* ---- RSVP wizard (with Supabase persistence & max 3 limit per phone) ---- */
+  /* ---- RSVP wizard (with Supabase persistence, conditional travel no & upsert support) ---- */
   (function(){
     var form=$('rv-form');if(!form)return;
     var panels=[1,2,3,4].map(function(i){return $('rv-p'+i)}),dots=qa('#wz-steps li'),back=$('rv-back'),next=$('rv-next'),err=$('rv-err');
@@ -330,17 +414,54 @@
     function fmtTime(t){if(!t)return '';var a=t.split(':'),h=+a[0],m=a[1],ap=h>=12?'PM':'AM';h=h%12||12;return h+':'+m+' '+ap}
     function slotOf(t){var h=parseInt(t,10);return h>=5&&h<12?'morning':h>=12&&h<16?'afternoon':h>=16&&h<20?'evening':'night'}
 
+    function updateTravelModeField(modeVal){
+      var wrap=$('rv-travel-no-wrap');
+      var inp=$('rv-travel-no');
+      var lblHi=$('rv-travel-no-hi');
+      var lblEn=$('rv-travel-no-en');
+      if(!wrap||!inp)return;
+
+      if(modeVal==='train'){
+        wrap.hidden=false;
+        if(lblHi)lblHi.textContent='ट्रेन नंबर या नाम (वैकल्पिक)';
+        if(lblEn)lblEn.textContent='Train Number / Name (Optional)';
+        inp.placeholder = isHi() ? 'जैसे: 12013 / शताब्दी एक्सप्रेस' : 'e.g. 12013 / Shatabdi Express';
+        inp.setAttribute('data-ph-hi','जैसे: 12013 / शताब्दी एक्सप्रेस');
+        inp.setAttribute('data-ph-en','e.g. 12013 / Shatabdi Express');
+      }else if(modeVal==='flight'){
+        wrap.hidden=false;
+        if(lblHi)lblHi.textContent='फ्लाइट नंबर (वैकल्पिक)';
+        if(lblEn)lblEn.textContent='Flight Number (Optional)';
+        inp.placeholder = isHi() ? 'जैसे: 6E-2134 / AI-461' : 'e.g. 6E-2134 / AI-461';
+        inp.setAttribute('data-ph-hi','जैसे: 6E-2134 / AI-461');
+        inp.setAttribute('data-ph-en','e.g. 6E-2134 / AI-461');
+      }else{
+        wrap.hidden=true;
+        inp.value='';
+        S.travel_number='';
+      }
+    }
+
+    qa('input[name="rv-mode"]', form).forEach(function(r){
+      r.addEventListener('change', function(){
+        updateTravelModeField(this.value);
+      });
+    });
+
     function collect(){
       S.name=clean(val('rv-name'),60);S.phone=clean(val('rv-phone'),20);S.att=radio('rv-att');
       S.cnt=val('rv-count')||'1';S.cntx=val('rv-countx');S.days=days();
       S.arr=val('rv-arr');S.slot=radio('rv-slot');S.time=val('rv-time');S.mode=radio('rv-mode');
+      S.travel_number=(S.mode==='train'||S.mode==='flight')?clean(val('rv-travel-no'),40):'';
       lsSet('wd-rsvp-me',S);
     }
     function fill(){
-      var rn=$('rv-name'),rp=$('rv-phone'),rc=$('rv-count'),rcx=$('rv-countx'),rcxw=$('rv-countx-w'),ra=$('rv-arr'),rt=$('rv-time');
+      var rn=$('rv-name'),rp=$('rv-phone'),rc=$('rv-count'),rcx=$('rv-countx'),rcxw=$('rv-countx-w'),ra=$('rv-arr'),rt=$('rv-time'),trv=$('rv-travel-no');
       if(rn)rn.value=S.name||myName();if(rp)rp.value=S.phone||'';setRadio('rv-att',S.att||'');
       if(rc)rc.value=S.cnt||'1';if(rcx)rcx.value=S.cntx||'';if(rcxw)rcxw.hidden=(rc&&rc.value!=='15+');
       setDays(S.days||[]);if(ra)ra.value=S.arr||'';setRadio('rv-slot',S.slot||'');if(rt)rt.value=S.time||'';setRadio('rv-mode',S.mode||'');
+      if(trv)trv.value=S.travel_number||'';
+      updateTravelModeField(S.mode||radio('rv-mode'));
     }
     function showErr(m){if(!err)return;err.textContent='';if(m){err.appendChild(el('span','hi',m[0]));err.appendChild(el('span','en',m[1]))}}
     function validate(n){
@@ -362,7 +483,21 @@
     }
     function record(){
       var d=digits();if(!d)return;var all=lsGet('wd-rsvps',{});
-      all[d]={name:S.name,att:S.att,cnt:S.att==='yes'?count():0,days:S.att==='yes'?(S.days||[]):[],joined:!!S.joined,grp:S.joined?(S.grp||count()):0,ts:Date.now()};
+      all[d]={
+        id:S.id||null,
+        name:S.name,
+        att:S.att,
+        cnt:S.att==='yes'?count():0,
+        days:S.att==='yes'?(S.days||[]):[],
+        arrival_date:S.att==='yes'&&S.arr?parseInt(S.arr,10):null,
+        arrival_slot:S.att==='yes'?S.slot:null,
+        arrival_time:S.att==='yes'?(S.time||null):null,
+        travel_mode:S.att==='yes'?S.mode:null,
+        travel_number:S.att==='yes'?(S.travel_number||null):null,
+        joined:!!S.joined,
+        grp:S.joined?(S.grp||count()):0,
+        ts:Date.now()
+      };
       lsSet('wd-rsvps',all);
     }
     function show(n,noScroll){
@@ -390,7 +525,8 @@
         sumLine(ul,'सदस्य','Members',String(n),String(n));
         sumLine(ul,'दिन','Days',dd+' नवंबर',dd+' Nov');
         var sl=SLOT[S.slot]||['',''],tm=S.time?' · '+fmtTime(S.time):'',md=MODE[S.mode]||['',''];
-        sumLine(ul,'आगमन','Arrival',S.arr+' नवंबर · '+sl[0]+tm+' · '+md[0],S.arr+' Nov · '+sl[1]+tm+' · '+md[1]);
+        var trvNo=(S.travel_number&&(S.mode==='train'||S.mode==='flight'))?' ('+S.travel_number+')':'';
+        sumLine(ul,'आगमन','Arrival',S.arr+' नवंबर · '+sl[0]+tm+' · '+md[0]+trvNo,S.arr+' Nov · '+sl[1]+tm+' · '+md[1]+trvNo);
       }
       refreshLinks();
     }
@@ -398,18 +534,20 @@
 
     function saveRsvpToSupabase(onDone){
       var payload={
-        name: S.name,
-        phone: digits(),
-        attending: S.att,
-        member_count: S.att==='yes'?count():0,
-        member_count_exact: S.cnt==='15+'?(parseInt(S.cntx,10)||null):null,
-        days: S.att==='yes'?(S.days||[]):null,
-        arrival_date: S.att==='yes'&&S.arr?parseInt(S.arr,10):null,
-        arrival_slot: S.att==='yes'?S.slot:null,
-        arrival_time: S.att==='yes'?(S.time||null):null,
-        travel_mode: S.att==='yes'?S.mode:null,
-        wa_group_joined: !!S.joined,
-        wa_group_count: S.joined?(S.grp||count()):0
+        p_id: S.id || null,
+        p_name: S.name,
+        p_phone: digits(),
+        p_attending: S.att,
+        p_member_count: S.att==='yes'?count():0,
+        p_member_count_exact: S.cnt==='15+'?(parseInt(S.cntx,10)||null):null,
+        p_days: S.att==='yes'?(S.days||[]):null,
+        p_arrival_date: S.att==='yes'&&S.arr?parseInt(S.arr,10):null,
+        p_arrival_slot: S.att==='yes'?S.slot:null,
+        p_arrival_time: S.att==='yes'?(S.time||null):null,
+        p_travel_mode: S.att==='yes'?S.mode:null,
+        p_travel_number: S.att==='yes'?(S.travel_number||null):null,
+        p_wa_group_joined: !!S.joined,
+        p_wa_group_count: S.joined?(S.grp||count()):0
       };
 
       if(!SBX.enabled){
@@ -418,7 +556,7 @@
       }
 
       SBX.use(function(client){
-        client.from('rsvps').insert(payload).then(function(res){
+        client.rpc('upsert_rsvp', payload).then(function(res){
           if(res.error){
             if(res.error.code==='P0001' || (res.error.message && res.error.message.indexOf('maximum allowed')>-1)){
               if(onDone)onDone(['इस मोबाइल नंबर से अधिकतम 3 RSVP पहले ही दर्ज हैं।', 'This mobile number already has 3 RSVP records (maximum allowed).']);
@@ -426,6 +564,10 @@
               if(onDone)onDone(['RSVP सहेजने में समस्या आई — कृपया पुनः प्रयास करें।', 'Could not save RSVP — please try again.']);
             }
           }else{
+            if(res.data){
+              S.id=res.data;
+              persist();
+            }
             if(onDone)onDone(null);
           }
         });
@@ -482,51 +624,13 @@
       });
     }
 
-    /* VIP welcome pass (PNG) */
-    function rr(x,a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath()}
-    function spaced(x,t,cx0,y,sp){var w=0,i,ws=[];for(i=0;i<t.length;i++){ws[i]=x.measureText(t.charAt(i)).width;w+=ws[i]}w+=sp*(t.length-1);var px=cx0-w/2,al=x.textAlign;x.textAlign='left';for(i=0;i<t.length;i++){x.fillText(t.charAt(i),px,y);px+=ws[i]+sp}x.textAlign=al}
-    function fitText(x,t,font,size,maxW){var s=size;do{x.font=font.replace('%s',s);if(x.measureText(t).width<=maxW||s<=22)break;s-=2}while(true)}
-    function code(){var s=S.name+digits(),h=7,i;for(i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return'MA-'+('00000'+h.toString(36).toUpperCase()).slice(-5)}
-    function drawPass(){
-      var W=900,H=1280,c=el('canvas');c.width=W;c.height=H;var x=c.getContext('2d');
-      var SERIF="'Cormorant Garamond','Tiro Devanagari Hindi',Georgia,serif",DEVA="'Tiro Devanagari Hindi','Cormorant Garamond',Georgia,serif",SANS="Mukta,'Segoe UI',Arial,sans-serif";
-      var g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#fdf4ea');g.addColorStop(1,'#f1d3bd');x.fillStyle=g;x.fillRect(0,0,W,H);
-      x.strokeStyle='#c9a05a';x.lineWidth=6;rr(x,30,30,W-60,H-60,36);x.stroke();x.lineWidth=2;rr(x,52,52,W-104,H-104,26);x.stroke();
-      x.textAlign='center';x.textBaseline='alphabetic';
-      x.fillStyle='#8a5a0c';x.font='700 30px '+DEVA;x.fillText('॥ श्री गणेशाय नमः ॥',W/2,130);
-      x.fillStyle='#7d1022';x.font='700 27px '+SANS;spaced(x,'VIP WELCOME PASS',W/2,200,7);
-      x.fillStyle='#7d1022';fitText(x,'Manisha weds Atul','italic 500 %spx '+SERIF,104,760);x.fillText('Manisha weds Atul',W/2,330);
-      x.font='500 54px '+DEVA;x.fillText('मनीषा संग अतुल',W/2,408);
-      x.strokeStyle='#c9a05a';x.lineWidth=2;x.beginPath();x.moveTo(200,470);x.lineTo(W/2-18,470);x.moveTo(W/2+18,470);x.lineTo(W-200,470);x.stroke();
-      x.fillStyle='#8a5a0c';x.save();x.translate(W/2,470);x.rotate(Math.PI/4);x.fillRect(-7,-7,14,14);x.restore();
-      x.fillStyle='#8a5a0c';x.font='600 28px '+SANS;spaced(x,'WELCOME',W/2,545,6);
-      x.fillStyle='#7d1022';fitText(x,S.name,'italic 500 %spx '+SERIF,92,740);x.fillText(S.name,W/2,640);
-      x.fillStyle='#4b1620';x.font='600 34px '+SANS;x.fillText('Party of '+count(),W/2,705);
-      var rows=[['CEREMONIES',(S.days||[]).join('  ·  ')+'  Nov'],['ARRIVAL',S.arr+' Nov  ·  '+(SLOT[S.slot]?SLOT[S.slot][1]:'')+(S.time?'  ·  '+fmtTime(S.time):'')+'  ·  '+(MODE[S.mode]?MODE[S.mode][1].replace(/^\S+\s/,''):'')],['VENUE','Freedom Grand, Amritsar']];
-      var y=800;
-      rows.forEach(function(r){x.fillStyle='#8a5a0c';x.font='700 22px '+SANS;spaced(x,r[0],W/2,y,5);x.fillStyle='#4b1620';fitText(x,r[1],'600 %spx '+SANS,34,740);x.fillText(r[1],W/2,y+46);y+=116});
-      x.fillStyle='#7d1022';rr(x,150,1096,W-300,82,41);x.fill();
-      x.fillStyle='#fdf4ea';x.font='700 32px '+SANS;x.fillText('16 November 2026',W/2,1148);
-      x.fillStyle='#8a5a0c';x.font='600 22px '+SANS;spaced(x,'PASS  '+code(),W/2,1206,4);
-      return c;
-    }
-    function loadFonts(cb){
-      var fin=false;function go(){if(!fin){fin=true;cb()}}setTimeout(go,1800);
-      try{if(DOC.fonts&&DOC.fonts.load){Promise.all([DOC.fonts.load('italic 500 40px "Cormorant Garamond"','Manisha'),DOC.fonts.load('400 30px "Tiro Devanagari Hindi"','मनीषा संग अतुल ॥ श्री गणेशाय नमः'),DOC.fonts.load('600 30px Mukta','VIP')]).then(go,go)}else go()}catch(e){go()}
-    }
-    var rPassBtn=$('rv-pass-btn');
-    if(rPassBtn){
-      rPassBtn.addEventListener('click',function(){
-        collect();
-        loadFonts(function(){
-          var c=drawPass(),img=$('rv-pass-img');
-          try{img.src=c.toDataURL('image/png');$('rv-prev').hidden=false}catch(e){}
-          function save(b){
-            try{var url=URL.createObjectURL(b),a=el('a');a.href=url;a.download='VIP-Welcome-Pass-'+(S.name||'guest').replace(/[^\w\u0900-\u097F]+/g,'-').slice(0,30)+'.png';DOC.body.appendChild(a);a.click();DOC.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url)},4000)}catch(e){}
-          }
-          if(c.toBlob){c.toBlob(function(b){if(b)save(b)},'image/png')}
-          toast('आपका VIP पास तैयार है','Your VIP pass is ready');
-        });
+    /* Update RSVP Information button */
+    var updateBtn=$('rv-update-btn');
+    if(updateBtn){
+      updateBtn.addEventListener('click', function(){
+        fill();
+        show(1);
+        toast('आप अपनी RSVP जानकारी अपडेट कर सकते हैं','You can now update your RSVP information');
       });
     }
 
@@ -686,31 +790,15 @@
     render();
   })();
 
-  /* ---- family directory: search + filter ---- */
+  /* ---- family directory: category filter ---- */
   (function(){
     var groups=qa('.fam .grp');if(!groups.length)return;
-    var inp=$('fam-q'),none=$('fam-none'),chips=qa('.fchip'),cur='all';
-    groups.forEach(function(g){
-      qa('li',g).forEach(function(li){li.setAttribute('data-s',li.textContent.toLowerCase().replace(/\s+/g,' '))});
-    });
+    var chips=qa('.fchip'),cur='all';
     function apply(){
-      var s=inp?inp.value.toLowerCase().replace(/\s+/g,' ').trim():'',any=false;
       groups.forEach(function(g,gi){
-        var vis=0;
-        qa('li',g).forEach(function(li){
-          var ok=!s||li.getAttribute('data-s').indexOf(s)>-1;
-          li.hidden=!ok;
-          if(ok)vis++;
-        });
-        // If searching with keyword, show all matching groups across categories.
-        // If search box is empty, adhere to selected filter chip.
-        var shouldShow = s ? (vis>0) : ((cur==='all'||+cur===gi)&&vis>0);
-        g.hidden=!shouldShow;
-        if(!g.hidden)any=true;
+        g.hidden=!(cur==='all'||+cur===gi);
       });
-      if(none)none.hidden=any;
     }
-    if(inp)inp.addEventListener('input',apply);
     chips.forEach(function(ch){
       ch.addEventListener('click',function(){
         cur=ch.getAttribute('data-f');
@@ -718,6 +806,7 @@
         apply();
       });
     });
+    apply();
   })();
 
   /* ---- Sangeet jukebox (shared via Supabase with realtime rankings & votes) ---- */
@@ -935,21 +1024,24 @@
     var authPasscode=sessionStorage.getItem('wd-ad-auth')||'';
 
     var loginDiv=$('ad-login'), bodyDiv=$('ad-body'), pwdI=$('ad-pwd'), unlockBtn=$('ad-unlock'), authErr=$('ad-err'), logoutBtn=$('ad-logout');
+    var currentRsvpsList=[];
 
     function base(){return location.href.split(/[?#]/)[0]}
     function link(){var n=clean(nameI.value,60);return base()+(n?'?guest='+encodeURIComponent(n):'')}
     function upd(){var l=link();linkI.value=l;waA.href='https://wa.me/?text='+encodeURIComponent((nameI.value.trim()?'Dear '+clean(nameI.value,60)+',\n':'')+'You are warmly invited to the wedding of Manisha & Atul (16 Nov 2026, Amritsar).\nसादर आमंत्रण: '+l)}
 
     function renderStats(list){
+      currentRsvpsList=list||[];
       var y=0,m=0,g=0,ul=$('ad-list');ul.textContent='';
-      list.forEach(function(r){
+      currentRsvpsList.forEach(function(r){
         if(r.attending==='yes'||r.att==='yes'){
           y++;
           m+=(r.member_count!=null?r.member_count:r.cnt)||0;
           g+=(r.wa_group_joined||r.joined)?(r.wa_group_count||r.grp||0):0;
         }
         var li=el('li');
-        var nameSpan=el('span','',r.name + (r.phone ? ' ('+r.phone+')' : ''));
+        var trvInfo=(r.travel_number?' ['+r.travel_number+']':'');
+        var nameSpan=el('span','',r.name + (r.phone ? ' ('+r.phone+')' : '') + trvInfo);
         li.appendChild(nameSpan);
         var isAtt = (r.attending==='yes'||r.att==='yes');
         var cntVal = (r.member_count!=null?r.member_count:r.cnt)||0;
@@ -957,7 +1049,7 @@
         var st=isAtt?bi('✅ '+cntVal+' सदस्य'+(grpVal?' · समूह '+grpVal:''),'✅ '+cntVal+' member(s)'+(grpVal?' · group '+grpVal:'')):bi('🙏 नहीं आ पाएँगे','🙏 Not attending');
         li.appendChild(st);ul.appendChild(li);
       });
-      $('st-n').textContent=list.length;$('st-y').textContent=y;$('st-m').textContent=m;$('st-g').textContent=g;
+      $('st-n').textContent=currentRsvpsList.length;$('st-y').textContent=y;$('st-m').textContent=m;$('st-g').textContent=g;
     }
 
     function loadHostData(){
@@ -983,6 +1075,76 @@
         renderStats(list);
         renderWishes(WALL.get(), false);
       }
+    }
+
+    /* ---- RSVP Excel (.csv) export ---- */
+    var SLOT={morning:['प्रातः','Morning'],afternoon:['दोपहर','Afternoon'],evening:['सायं','Evening'],night:['रात्रि','Night']};
+    var MODE={train:['🚆 रेल','🚆 Train'],flight:['✈️ विमान','✈️ Flight'],car:['🚗 कार','🚗 Car'],bus:['🚌 बस','🚌 Bus']};
+    function fmtTime(t){if(!t)return '';var a=t.split(':'),h=+a[0],m=a[1],ap=h>=12?'PM':'AM';h=h%12||12;return h+':'+m+' '+ap}
+
+    function rsvpCsvText(){
+      var headers = [
+        'Guest Name',
+        'Attending Status',
+        'Members Count',
+        'Selected Days',
+        'Arrival Date',
+        'Arrival Slot',
+        'Travel Mode',
+        'Train / Flight No.',
+        'Notes',
+        'Submitted At'
+      ];
+      var rows = [headers];
+      currentRsvpsList.forEach(function(r){
+        var isAtt = (r.attending === 'yes' || r.att === 'yes');
+        var cnt = isAtt ? ((r.member_count_exact != null ? r.member_count_exact : r.member_count) || r.cnt || 1) : 0;
+        var days = (r.days || []).map(function(d){ return d + ' Nov'; }).join('; ');
+        var arrDate = r.arrival_date ? r.arrival_date + ' Nov' : (r.arr ? r.arr + ' Nov' : '');
+        var slotName = r.arrival_slot ? (SLOT[r.arrival_slot] ? SLOT[r.arrival_slot][1] : r.arrival_slot) : '';
+        var exactTime = r.arrival_time ? ' (' + fmtTime(r.arrival_time) + ')' : '';
+        var arrSlot = (slotName || exactTime) ? (slotName + exactTime) : '';
+        var modeName = r.travel_mode ? (MODE[r.travel_mode] ? MODE[r.travel_mode][1].replace(/^\S+\s/,'') : r.travel_mode) : '';
+        var trvNo = r.travel_number || '';
+        var notes = (r.wa_group_joined || r.joined) ? ('WhatsApp Group Joined (Party of ' + ((r.wa_group_count!=null?r.wa_group_count:r.grp)||cnt||1) + ')') : 'WhatsApp Group: Not yet';
+        var submittedAt = fmtWhen(r.created_at || r.ts);
+        rows.push([
+          r.name || '',
+          isAtt ? 'Attending' : 'Not Attending',
+          cnt,
+          days,
+          arrDate,
+          arrSlot,
+          modeName,
+          trvNo,
+          notes,
+          submittedAt
+        ]);
+      });
+      return rows.map(function(row){ return row.map(csvCell).join(','); }).join('\r\n');
+    }
+
+    var adRsvpExcel = $('ad-rsvpexcel');
+    if(adRsvpExcel){
+      adRsvpExcel.addEventListener('click', function(){
+        if(!currentRsvpsList.length){
+          toast('अभी कोई RSVP डेटा नहीं है', 'No RSVP data yet');
+          return;
+        }
+        try {
+          var b = new Blob(['\ufeff' + rsvpCsvText()], { type: 'text/csv;charset=utf-8' });
+          var url = URL.createObjectURL(b), a = el('a');
+          a.href = url;
+          a.download = 'Manisha-Atul-Wedding-RSVPs.csv';
+          DOC.body.appendChild(a);
+          a.click();
+          DOC.body.removeChild(a);
+          setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+          toast('RSVP एक्सेल डाउनलोड हो गया 📊', 'RSVP Excel downloaded 📊');
+        } catch(e) {
+          toast('डाउनलोड नहीं हो सका', 'Download failed');
+        }
+      });
     }
 
     /* ---- guest wishes: list + CSV export ---- */
@@ -1103,9 +1265,6 @@
     var adClose=$('ad-close');if(adClose)adClose.addEventListener('click',function(){MODAL.close('admin')});
     if(nameI)nameI.addEventListener('input',upd);
     var adCopy=$('ad-copy');if(adCopy)adCopy.addEventListener('click',function(){copyText(linkI.value,function(ok){ok?toast('लिंक कॉपी हो गया','Link copied'):(linkI.select(),toast('लिंक चुना गया — कॉपी करें','Link selected — please copy it'))})});
-    var adReset=$('ad-reset');if(adReset)adReset.addEventListener('click',function(){
-      if(window.confirm('Reset RSVP data stored on this device? / इस उपकरण का RSVP डेटा मिटाएँ?')){try{localStorage.removeItem('wd-rsvps');localStorage.removeItem('wd-rsvp-me')}catch(e){}loadHostData();toast('डेटा मिटा दिया गया','Data cleared — reload to reset the form')}
-    });
   })();
 
   /* ---- Mobile App Shell Bottom Navigation Bar & Smooth Scroll ---- */

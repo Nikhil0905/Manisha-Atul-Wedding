@@ -12,12 +12,20 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<audio id="bg-music" src="bg-music.mpeg" loop preload="auto"></audio>
 
 <input class="rl" type="radio" name="lang" id="r-hi" checked aria-label="हिन्दी">
 <input class="rl" type="radio" name="lang" id="r-en" aria-label="English">
-<div class="lang" role="group" aria-label="Language">
-  <label for="r-hi" class="lb-hi">हिन्दी</label>
-  <label for="r-en" class="lb-en">English</label>
+<div class="top-bar">
+  <button type="button" class="music-btn" id="music-btn" aria-label="Toggle background music">
+    <span class="m-icon" id="m-icon" aria-hidden="true">🔊</span>
+    <span class="m-text on-text"><span class="hi">संगीत चालू</span><span class="en">Music On</span></span>
+    <span class="m-text off-text" hidden><span class="hi">संगीत बंद</span><span class="en">Muted</span></span>
+  </button>
+  <div class="lang" role="group" aria-label="Language">
+    <label for="r-hi" class="lb-hi">हिन्दी</label>
+    <label for="r-en" class="lb-en">English</label>
+  </div>
 </div>
 
 <main class="card">
@@ -76,7 +84,7 @@
     </div>
     <p class="countnote" id="c-note"></p>
     <div class="calbox"><div class="cal" aria-label="November 2026"><div class="calh"><span class="hi">नवंबर 2026</span><span class="en">November 2026</span></div><div class="calw"><u class="hi">र</u><u class="hi">सो</u><u class="hi">मं</u><u class="hi">बु</u><u class="hi">गु</u><u class="hi">शु</u><u class="hi">श</u><u class="en">S</u><u class="en">M</u><u class="en">T</u><u class="en">W</u><u class="en">T</u><u class="en">F</u><u class="en">S</u></div><div class="calg"><b>1</b><b>2</b><b>3</b><b>4</b><b>5</b><b>6</b><b>7</b><b>8</b><b>9</b><b>10</b><b>11</b><b class="ev5">12</b><b class="ev5">13</b><b>14</b><b class="ev5">15</b><b class="ev6">16</b><b>17</b><b>18</b><b>19</b><b>20</b><b>21</b><b>22</b><b>23</b><b>24</b><b>25</b><b>26</b><b>27</b><b>28</b><b>29</b><b>30</b></div></div><div class="leg"><span><i class="d5"></i><span class="hi">उत्सव के दिन</span><span class="en">Celebration days</span></span><span><i class="d6"></i><span class="hi">विवाह</span><span class="en">Wedding</span></span></div>
-      <a class="btn" id="ics-btn" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Manisha+%26+Atul+Wedding&amp;dates=20261112%2F20261117&amp;details=Wedding+celebrations+of+Manisha+%26+Atul%2C+Amritsar.%0A%0A%F0%9F%8F%A8+Stay+(12-16+Nov)%3A+RRV+HOTEL%2C+20-M%2C+Sant+Nagar%2C+Amritsar+Cantt.%0A%F0%9F%8E%B6+Sangeet+(15+Nov)%3A+La+Fiesta+Resort%2C+Attari+Road%2C+Amritsar%0A%F0%9F%92%8D+Wedding+(16+Nov)%3A+Freedom+Grand%2C+G+T+Road%2C+Amritsar%0A%0ASchedule%3A%0A12+Nov%3A+Ganesh+Pooja+10%3A00+AM%2C+Bangles+4%3A00+PM%0A13+Nov%3A+Mehndi+12%3A00+PM%0A15+Nov%3A+Haldi+12%3A00+PM%2C+Ring+Ceremony+7%3A00+PM%2C+Sangeet+8%3A00+PM%0A16+Nov%3A+Chak+Bhath+12%3A00+PM%2C+Wedding+Barat+8%3A00+PM&amp;location=RRV+Hotel+(Stay)+%7C+La+Fiesta+Resort+(Sangeet)+%7C+Freedom+Grand+(Wedding)%2C+Amritsar" target="_blank" rel="noopener"><span class="hi">📅 कैलेंडर में जोड़ें</span><span class="en">📅 Add to Calendar</span></a></div>
+      <a class="btn" id="ics-btn" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Manisha+%26+Atul+Wedding&amp;dates=20261112%2F20261117&amp;details=Wedding+celebrations+of+Manisha+%26+Atul%2C+Amritsar.%0A%0A%F0%9F%8F%A8+Stay+(15-16+Nov)%3A+RRV+HOTEL%2C+20-M%2C+Sant+Nagar%2C+Amritsar+Cantt.%0A%F0%9F%8E%B6+Sangeet+(15+Nov)%3A+La+Fiesta+Resort%2C+Attari+Road%2C+Amritsar%0A%F0%9F%92%8D+Wedding+(16+Nov)%3A+Freedom+Grand%2C+G+T+Road%2C+Amritsar%0A%0ASchedule%3A%0A12+Nov%3A+Ganesh+Pooja+10%3A00+AM%2C+Bangles+4%3A00+PM%0A13+Nov%3A+Mehndi+12%3A00+PM%0A15+Nov%3A+Haldi+12%3A00+PM%2C+Ring+Ceremony+7%3A00+PM%2C+Sangeet+8%3A00+PM%0A16+Nov%3A+Chak+Bhath+12%3A00+PM%2C+Wedding+Barat+8%3A00+PM&amp;location=RRV+Hotel+(Stay)+%7C+La+Fiesta+Resort+(Sangeet)+%7C+Freedom+Grand+(Wedding)%2C+Amritsar" target="_blank" rel="noopener"><span class="hi">📅 कैलेंडर में जोड़ें</span><span class="en">📅 Add to Calendar</span></a></div>
   </section>
 
   <section class="sec" id="events">
@@ -119,7 +127,7 @@
         <li class="on"><b>1</b><span class="hi">आप</span><span class="en">You</span></li>
         <li><b>2</b><span class="hi">दिन</span><span class="en">Days</span></li>
         <li><b>3</b><span class="hi">आगमन</span><span class="en">Arrival</span></li>
-        <li><b>4</b><span class="hi">पास</span><span class="en">Pass</span></li>
+        <li><b>4</b><span class="hi">पुष्टि</span><span class="en">Confirmation</span></li>
       </ol>
 
       <div class="pn on" id="rv-p1">
@@ -176,6 +184,13 @@
             <label class="chip"><input type="radio" name="rv-mode" value="bus"><span class="c"><span class="hi">🚌 बस</span><span class="en">🚌 Bus</span></span></label>
           </div>
         </div>
+        <div class="fl" id="rv-travel-no-wrap" hidden>
+          <label id="rv-travel-no-lbl" for="rv-travel-no">
+            <span class="hi" id="rv-travel-no-hi">ट्रेन नंबर या नाम (वैकल्पिक)</span>
+            <span class="en" id="rv-travel-no-en">Train Number / Name (Optional)</span>
+          </label>
+          <input type="text" id="rv-travel-no" maxlength="40" placeholder="e.g. 12013 / Shatabdi Express" data-ph-hi="जैसे: 12013 / शताब्दी एक्सप्रेस" data-ph-en="e.g. 12013 / Shatabdi Express">
+        </div>
       </div>
 
       <div class="pn" id="rv-p4">
@@ -187,9 +202,8 @@
           <a class="bt wab" id="rv-grp-btn" href="https://chat.whatsapp.com/HcYo4IcvSz9E0eE0SPuYUY?s=cl&amp;p=a&amp;mlu=4&amp;ilr=4&amp;iam=2" target="_blank" rel="noopener"><span class="hi">💬 WhatsApp समूह से जुड़ें</span><span class="en">💬 Join the WhatsApp Group</span></a>
         </div>
         <div class="acts2">
-          <button type="button" class="bt" id="rv-pass-btn"><span class="hi">🎟️ VIP वेलकम पास डाउनलोड करें (PNG)</span><span class="en">🎟️ Download VIP Welcome Pass (PNG)</span></button>
+          <button type="button" class="bt alt" id="rv-update-btn"><span class="hi">✏️ RSVP जानकारी अपडेट करें</span><span class="en">✏️ Update RSVP information</span></button>
         </div>
-        <div class="passprev" id="rv-prev" hidden><img id="rv-pass-img" alt="VIP Welcome Pass"><p class="hint"><span class="hi">डाउनलोड न हो तो तस्वीर को दबाकर रखें और सेव करें।</span><span class="en">If the download doesn’t start, long-press the image to save it.</span></p></div>
       </div>
 
       <p class="err" id="rv-err" role="alert"></p>
@@ -244,7 +258,7 @@
     <div class="venues-grid">
       <!-- 1. Stay -->
       <div class="vcard">
-        <div class="vtag"><span class="hi">ठहरने का स्थान · 12–16 नवंबर</span><span class="en">Stay · 12–16 Nov</span></div>
+        <div class="vtag"><span class="hi">ठहरने का स्थान · 15–16 नवंबर</span><span class="en">Stay · 15–16 Nov</span></div>
         <h3 class="vnm"><span class="hi">आरआरवी होटल</span><span class="en">RRV HOTEL</span></h3>
         <p class="vaddr"><span class="hi">20-M, संत नगर, अमृतसर कैंट, पंजाब 143006</span><span class="en">20-M, Sant Nagar, Amritsar Cantt., Punjab 143006</span></p>
         <div class="vbtns">
@@ -272,23 +286,12 @@
         </div>
       </div>
     </div>
-
-    <div class="venue-transit">
-      <ul class="trav">
-        <li><span class="ti" aria-hidden="true">✈️</span><span class="tt"><b><span class="hi">हवाई अड्डा</span><span class="en">Airport</span></b><small><span class="hi">श्री गुरु रामदास जी अंतरराष्ट्रीय · लगभग 18 किमी · ~40 मिनट</span><span class="en">Sri Guru Ram Dass Jee Intl. · approx. 18 km · ~40 min</span></small></span><a class="tl2" href="https://www.google.com/maps/dir/?api=1&amp;origin=Sri+Guru+Ram+Dass+Jee+International+Airport+Amritsar&amp;destination=Freedom+Grand+G+T+Road+Opposite+Nexus+Mall+Amritsar" target="_blank" rel="noopener"><span class="hi">रास्ता</span><span class="en">Route</span></a></li>
-        <li><span class="ti" aria-hidden="true">🚆</span><span class="tt"><b><span class="hi">रेलवे स्टेशन</span><span class="en">Railway Station</span></b><small><span class="hi">अमृतसर जंक्शन · लगभग 6 किमी · ~20 मिनट</span><span class="en">Amritsar Junction · approx. 6 km · ~20 min</span></small></span><a class="tl2" href="https://www.google.com/maps/dir/?api=1&amp;origin=Amritsar+Junction+Railway+Station&amp;destination=Freedom+Grand+G+T+Road+Opposite+Nexus+Mall+Amritsar" target="_blank" rel="noopener"><span class="hi">रास्ता</span><span class="en">Route</span></a></li>
-      </ul>
-      <p class="fine"><span class="hi">दूरी/समय अनुमानित हैं; यातायात के अनुसार बदल सकते हैं।</span><span class="en">Distances and times are approximate and vary with traffic.</span></p>
-    </div>
   </section>
 
   <section class="sec" id="family">
     <div class="eyebrow"><span class="hi">परिवारजन</span><span class="en">With Love From</span></div>
     <h2><span class="hi">आपके स्वागत में</span><span class="en">Our Families</span></h2>
     <div class="orn"><i></i></div>
-    <div class="fam-search-wrap">
-      <input type="text" id="fam-q" class="fam-search" maxlength="40" data-ph-hi="🔍 परिवारजन का नाम खोजें…" data-ph-en="🔍 Search by family member name…" placeholder="🔍 Search by family member name…">
-    </div>
     <div class="dirctl">
       <div class="fchips">
         <button type="button" class="fchip" data-f="all" aria-pressed="true"><span class="hi">सभी</span><span class="en">All</span></button>
@@ -309,7 +312,6 @@
       <div class="grp"><h3><span class="hi">जंवाई पक्ष</span><span class="en">Jamai Paksh</span></h3><ul>
         <li><span class="hi">स्व. दुर्गा देवी-सत्यनारायण जी झंवर</span><span class="en">Late Durga Devi-Satyanarayan Ji Jhanwar</span></li><li><span class="hi">सुमित्रा-सुभाष जी परवाल</span><span class="en">Sumitra-Subhash Ji Parwal</span></li><li><span class="hi">मीना-श्याम जी लढा</span><span class="en">Meena-Shyam Ji Ladha</span></li><li><span class="hi">रिंकू-घनश्याम जी कचोलिया</span><span class="en">Rinku-Ghanshyam Ji Kacholiya</span></li><li><span class="hi">भारती-हर्ष जी मेहरा</span><span class="en">Bharti-Harsh Ji Mehra</span></li><li><span class="hi">भावना-करण जी मेहता</span><span class="en">Bhawna-Karan Ji Mehta</span></li></ul></div>
     </div>
-    <p class="hint" id="fam-none" hidden><span class="hi">कोई नाम नहीं मिला।</span><span class="en">No matching name found.</span></p>
   </section>
 
   <section class="sec" id="jukebox">
@@ -455,10 +457,12 @@
         <div><b id="st-m">0</b><span class="hi">सदस्य</span><span class="en">Members</span></div>
         <div><b id="st-g">0</b><span class="hi">WhatsApp समूह</span><span class="en">In group</span></div>
       </div>
+      <div class="mrow" style="margin-top:10px">
+        <button type="button" class="bt sm" id="ad-rsvpexcel"><span class="hi">📊 RSVP एक्सेल डाउनलोड करें (.csv)</span><span class="en">📊 Download RSVP Excel (.csv)</span></button>
+      </div>
       <ul class="adl" id="ad-list"></ul>
       <p class="fine" id="ad-wlive" hidden><span class="hi">ये सभी मेहमानों के आंकड़े हैं (साझा Supabase डेटाबेस से)।</span><span class="en">These are live statistics from the shared Supabase database.</span></p>
       <p class="fine" id="ad-wlocal"><span class="hi">ये आँकड़े केवल इसी उपकरण/ब्राउज़र के हैं।</span><span class="en">These counts come from this device/browser only.</span></p>
-      <button type="button" class="lk" id="ad-reset"><span class="hi">इस उपकरण का RSVP डेटा मिटाएँ</span><span class="en">Reset RSVP data on this device</span></button>
       <h4><span class="hi">अतिथियों के आशीर्वाद</span><span class="en">Guest wishes</span> (<b id="ad-wcount">0</b>)</h4>
       <div class="mrow"><button type="button" class="bt sm" id="ad-wcsv"><span class="hi">CSV डाउनलोड करें</span><span class="en">Download CSV</span></button><button type="button" class="bt sm alt" id="ad-wcopy"><span class="hi">सब कॉपी करें</span><span class="en">Copy all</span></button></div>
       <ul class="adw" id="ad-wishes"></ul>
