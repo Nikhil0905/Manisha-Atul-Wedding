@@ -4,8 +4,17 @@
   var rh=$('r-hi'),re=$('r-en');
   function isHi(){return !(re&&re.checked)}
   try{var sv=localStorage.getItem('wd-lang'); if(sv==='en'&&re){re.checked=true}else if(sv==='hi'&&rh){rh.checked=true}}catch(e){}
-  function onLang(){try{localStorage.setItem('wd-lang',isHi()?'hi':'en')}catch(e){} document.documentElement.lang=isHi()?'hi':'en'; tick()}
-  try{rh.addEventListener('change',onLang);re.addEventListener('change',onLang);rh.addEventListener('click',onLang);re.addEventListener('click',onLang)}catch(e){}
+  function onLang(){
+    var hi=isHi();
+    try{localStorage.setItem('wd-lang',hi?'hi':'en')}catch(e){}
+    document.documentElement.lang=hi?'hi':'en';
+    if(window.__applyLang)window.__applyLang();
+    tick();
+  }
+  try{
+    if(rh){rh.addEventListener('change',onLang);rh.addEventListener('click',onLang)}
+    if(re){re.addEventListener('change',onLang);re.addEventListener('click',onLang)}
+  }catch(e){}
   onLang();
 
   // wedding: 16 Nov 2026, Barat 8 PM IST = 14:30 UTC
@@ -14,15 +23,17 @@
   function p(n){return n<10?'0'+n:''+n}
   function tick(){
     try{
-    var d=target-new Date().getTime(), hi=isHi();
-    if(d<=0){for(var i=0;i<4;i++){ids[i].textContent='00'} note.textContent=hi?'शुभ विवाह का समय आ गया है।':'The celebration has begun.';return}
-    var s=Math.floor(d/1000);
-    ids[0].textContent=Math.floor(s/86400); ids[1].textContent=p(Math.floor(s%86400/3600)); ids[2].textContent=p(Math.floor(s%3600/60)); ids[3].textContent=p(s%60);
-    note.textContent=hi?'अमृतसर में आपका स्वागत है।':'We look forward to welcoming you in Amritsar.';
+      var d=target-new Date().getTime(), hi=isHi();
+      if(d<=0){for(var i=0;i<4;i++){if(ids[i])ids[i].textContent='00'} if(note)note.textContent=hi?'शुभ विवाह का समय आ गया है।':'The celebration has begun.';return}
+      var s=Math.floor(d/1000);
+      if(ids[0])ids[0].textContent=Math.floor(s/86400);
+      if(ids[1])ids[1].textContent=p(Math.floor(s%86400/3600));
+      if(ids[2])ids[2].textContent=p(Math.floor(s%3600/60));
+      if(ids[3])ids[3].textContent=p(s%60);
+      if(note)note.textContent=hi?'अमृतसर में आपका स्वागत है।':'We look forward to welcoming you in Amritsar.';
     }catch(e){}
   }
   tick(); setInterval(tick,1000);
-
 })();
 
 /* =====================================================================
@@ -32,8 +43,8 @@
    - Pushp Varsha: Atomic shared counter with realtime updates
    - Song Jukebox: Public song requests with upvoting & realtime ranking
    - Floating Diyas: Public lake drift with realtime broadcast
-   - Guestbook / Wishes: Stored in Supabase for the host; local preview for guests
-   - Host Panel: Protected by host authentication; displays live database records & CSV export
+   - Guestbook / Wishes: Stored in Supabase with realtime public sync
+   - Host Panel: Protected by host authentication (passcode); live RSVP/Wishes export
    ===================================================================== */
 (function(){
   'use strict';
@@ -46,7 +57,7 @@
   var SB_URL='https://ccztjqrooksobsujfrgb.supabase.co';
   var SB_KEY='sb_publishable_MeNhfOye2Xc6HakRYOOm8Q_EBXrgppe';
 
-  /* shared between the wishes wall and the host panel */
+  /* shared between wishes wall and host panel */
   var WALL={get:function(){return[]},live:false,onChange:null};
 
   /* Shared Supabase Client Loader */
@@ -120,6 +131,46 @@
   var reduce=false;try{reduce=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(e){}
   function smoothTo(node,block){try{node.scrollIntoView({behavior:reduce?'auto':'smooth',block:block||'start'})}catch(e){node.scrollIntoView()}}
 
+  /* ---- accessible unified modal manager ---- */
+  var MODAL=(function(){
+    var activeModal=null, opener=null;
+    function open(id, triggerEl){
+      var m = typeof id==='string' ? $(id) : id;
+      if(!m) return;
+      opener = triggerEl || DOC.activeElement;
+      activeModal = m;
+      m.hidden = false;
+      DOC.body.classList.add('modal-open');
+      var closeBtn = q('.mx', m);
+      if(closeBtn) setTimeout(function(){try{closeBtn.focus()}catch(e){}}, 50);
+    }
+    function close(id){
+      var m = id ? (typeof id==='string' ? $(id) : id) : activeModal;
+      if(!m) return;
+      m.hidden = true;
+      if(activeModal===m) activeModal = null;
+      if(!q('.modal:not([hidden])')){
+        DOC.body.classList.remove('modal-open');
+      }
+      if(opener && opener.focus) try{opener.focus()}catch(e){}
+      opener = null;
+    }
+    // Global backdrop click & Escape key listeners
+    DOC.addEventListener('keydown', function(e){
+      if(e.key==='Escape' && activeModal && !activeModal.hidden){
+        close(activeModal);
+      }
+    });
+    qa('.modal').forEach(function(m){
+      m.addEventListener('click', function(e){
+        if(e.target===m) close(m);
+      });
+      var mx=q('.mx', m);
+      if(mx) mx.addEventListener('click', function(){close(m)});
+    });
+    return { open: open, close: close, current: function(){return activeModal} };
+  })();
+
   /* ---- toast ---- */
   var toastEl=$('toast'),toastT;
   function toast(hi,en){
@@ -153,12 +204,28 @@
     qa('[data-ph-hi]').forEach(function(n){n.placeholder=n.getAttribute(hi?'data-ph-hi':'data-ph-en')});
     qa('[data-t-hi]').forEach(function(n){n.textContent=n.getAttribute(hi?'data-t-hi':'data-t-en')});
   }
+  window.__applyLang = applyLang;
   ['r-hi','r-en'].forEach(function(id){var n=$(id);if(n){n.addEventListener('change',applyLang);n.addEventListener('click',applyLang)}});
   applyLang();
 
   /* ---- particle engine (confetti + petals) ---- */
   function makeFx(cv,full){
     var cx=cv.getContext('2d'),parts=[],raf=0,last=0,W=0,H=0,dpr=Math.min(window.devicePixelRatio||1,2);
+    var isVisible = true;
+
+    if(!full && 'IntersectionObserver' in window){
+      var cvObs=new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          isVisible = entry.isIntersecting;
+          if(isVisible && parts.length && !raf){
+            last=0;
+            raf=requestAnimationFrame(step);
+          }
+        });
+      }, {threshold: 0.05});
+      cvObs.observe(cv);
+    }
+
     function fit(){
       if(full){W=window.innerWidth;H=window.innerHeight}else{var p=cv.parentNode;W=p.clientWidth;H=p.clientHeight}
       cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);cv.style.width=W+'px';cv.style.height=H+'px';cx.setTransform(dpr,0,0,dpr,0,0);
@@ -171,6 +238,7 @@
       cx.restore();
     }
     function step(t){
+      if(!isVisible){raf=0;return}
       if(!last)last=t;var dt=Math.min(.05,(t-last)/1000);last=t;cx.clearRect(0,0,W,H);
       for(var i=parts.length-1;i>=0;i--){
         var p=parts[i];p.life-=dt;p.t+=dt;
@@ -183,7 +251,7 @@
     }
     return{
       dims:function(){if(!raf)fit();return{w:W,h:H}},
-      add:function(a){for(var i=0;i<a.length;i++)parts.push(a[i]);if(!raf){last=0;raf=requestAnimationFrame(step)}}
+      add:function(a){for(var i=0;i<a.length;i++)parts.push(a[i]);if(!raf&&isVisible){last=0;raf=requestAnimationFrame(step)}}
     };
   }
   function P(o){o.t=0;o.ph=o.ph||0;o.sw=o.sw||0;o.drag=o.drag||0;o.h=o.h||o.w;return o}
@@ -269,11 +337,12 @@
       lsSet('wd-rsvp-me',S);
     }
     function fill(){
-      $('rv-name').value=S.name||myName();$('rv-phone').value=S.phone||'';setRadio('rv-att',S.att||'');
-      $('rv-count').value=S.cnt||'1';$('rv-countx').value=S.cntx||'';$('rv-countx-w').hidden=($('rv-count').value!=='15+');
-      setDays(S.days||[]);$('rv-arr').value=S.arr||'';setRadio('rv-slot',S.slot||'');$('rv-time').value=S.time||'';setRadio('rv-mode',S.mode||'');
+      var rn=$('rv-name'),rp=$('rv-phone'),rc=$('rv-count'),rcx=$('rv-countx'),rcxw=$('rv-countx-w'),ra=$('rv-arr'),rt=$('rv-time');
+      if(rn)rn.value=S.name||myName();if(rp)rp.value=S.phone||'';setRadio('rv-att',S.att||'');
+      if(rc)rc.value=S.cnt||'1';if(rcx)rcx.value=S.cntx||'';if(rcxw)rcxw.hidden=(rc&&rc.value!=='15+');
+      setDays(S.days||[]);if(ra)ra.value=S.arr||'';setRadio('rv-slot',S.slot||'');if(rt)rt.value=S.time||'';setRadio('rv-mode',S.mode||'');
     }
-    function showErr(m){err.textContent='';if(m){err.appendChild(el('span','hi',m[0]));err.appendChild(el('span','en',m[1]))}}
+    function showErr(m){if(!err)return;err.textContent='';if(m){err.appendChild(el('span','hi',m[0]));err.appendChild(el('span','en',m[1]))}}
     function validate(n){
       if(n===1){
         if(!S.name)return['कृपया अपना नाम लिखें','Please enter your name'];
@@ -282,7 +351,7 @@
       }
       if(n===2){
         if(S.cnt==='15+'){var x=parseInt(S.cntx,10);if(!(x>15&&x<=300))return['कृपया कुल संख्या लिखें (16 या अधिक)','Please enter the exact number (16 or more)']}
-        if(!S.days.length)return['कृपया कम से कम एक दिन चुनें','Please choose at least one day'];
+        if(!S.days||!S.days.length)return['कृपया कम से कम एक दिन चुनें','Please choose at least one day'];
       }
       if(n===3){
         if(!S.arr)return['कृपया आगमन की तिथि चुनें','Please select your arrival date'];
@@ -293,38 +362,36 @@
     }
     function record(){
       var d=digits();if(!d)return;var all=lsGet('wd-rsvps',{});
-      all[d]={name:S.name,att:S.att,cnt:S.att==='yes'?count():0,days:S.att==='yes'?(S.days||[]):[],joined:!!S.joined,grp:S.joined?(S.grp||0):0,ts:Date.now()};
+      all[d]={name:S.name,att:S.att,cnt:S.att==='yes'?count():0,days:S.att==='yes'?(S.days||[]):[],joined:!!S.joined,grp:S.joined?(S.grp||count()):0,ts:Date.now()};
       lsSet('wd-rsvps',all);
     }
     function show(n,noScroll){
       step=n;
-      panels.forEach(function(p,i){p.classList.toggle('on',i===n-1)});
+      panels.forEach(function(p,i){if(p)p.classList.toggle('on',i===n-1)});
       dots.forEach(function(d,i){d.classList.toggle('on',i===n-1);d.classList.toggle('done',i<n-1)});
-      back.hidden=(n===1);next.hidden=(n===4);next.classList.toggle('last',n===3);
+      if(back)back.hidden=(n===1);if(next){next.hidden=(n===4);next.classList.toggle('last',n===3)}
       showErr(null);
       if(!noScroll){var r=form.getBoundingClientRect();if(r.top<0||r.top>window.innerHeight*.5)smoothTo(form,'start')}
     }
 
     /* step 4 */
-    function waText(){
-      var d=(S.days||[]).join(', ');
-      return ['*RSVP - Manisha weds Atul*','Name: '+S.name,'Phone: '+S.phone,'Attending: Yes','Members: '+count(),'Days: '+d+' Nov',
-        'Arrival: '+S.arr+' Nov, '+(SLOT[S.slot]?SLOT[S.slot][1]:'')+(S.time?' ('+fmtTime(S.time)+')':'')+', '+(MODE[S.mode]?MODE[S.mode][1].replace(/^\S+\s/,''):''),
-        'Joining WhatsApp group: '+(S.joined?S.grp:'not yet')+(GUEST?'\nInvite link name: '+GUEST:'')].join('\n');
-    }
     function groupHref(){return WA_GROUP_URL}
-    function refreshLinks(){$('rv-grp-btn').href=groupHref();$('rv-send').href='https://wa.me/'+HOST_WA+'?text='+encodeURIComponent(waText())}
+    function refreshLinks(){
+      var gBtn=$('rv-grp-btn');
+      if(gBtn) gBtn.href=groupHref();
+    }
     function sumLine(ul,lhi,len,vhi,ven){var li=el('li');li.appendChild(bi(lhi,len));li.appendChild(bi(vhi,ven));ul.appendChild(li)}
     function buildStep4(){
-      var n=count(),g=$('rv-grp-n'),ul=$('rv-sum');
-      g.max=n;g.min=1;S.grp=Math.max(1,Math.min(S.grp||1,n));g.value=S.grp;
-      ul.textContent='';
-      var dd=(S.days||[]).join(', ');
-      sumLine(ul,'नाम','Name',S.name,S.name);
-      sumLine(ul,'सदस्य','Members',String(n),String(n));
-      sumLine(ul,'दिन','Days',dd+' नवंबर',dd+' Nov');
-      var sl=SLOT[S.slot]||['',''],tm=S.time?' · '+fmtTime(S.time):'',md=MODE[S.mode]||['',''];
-      sumLine(ul,'आगमन','Arrival',S.arr+' नवंबर · '+sl[0]+tm+' · '+md[0],S.arr+' Nov · '+sl[1]+tm+' · '+md[1]);
+      var n=count(),ul=$('rv-sum');
+      if(ul){
+        ul.textContent='';
+        var dd=(S.days||[]).join(', ');
+        sumLine(ul,'नाम','Name',S.name,S.name);
+        sumLine(ul,'सदस्य','Members',String(n),String(n));
+        sumLine(ul,'दिन','Days',dd+' नवंबर',dd+' Nov');
+        var sl=SLOT[S.slot]||['',''],tm=S.time?' · '+fmtTime(S.time):'',md=MODE[S.mode]||['',''];
+        sumLine(ul,'आगमन','Arrival',S.arr+' नवंबर · '+sl[0]+tm+' · '+md[0],S.arr+' Nov · '+sl[1]+tm+' · '+md[1]);
+      }
       refreshLinks();
     }
     function persist(){lsSet('wd-rsvp-me',S)}
@@ -342,11 +409,11 @@
         arrival_time: S.att==='yes'?(S.time||null):null,
         travel_mode: S.att==='yes'?S.mode:null,
         wa_group_joined: !!S.joined,
-        wa_group_count: S.joined?(S.grp||0):0
+        wa_group_count: S.joined?(S.grp||count()):0
       };
 
       if(!SBX.enabled){
-        onDone(null);
+        if(onDone)onDone(null);
         return;
       }
 
@@ -354,61 +421,66 @@
         client.from('rsvps').insert(payload).then(function(res){
           if(res.error){
             if(res.error.code==='P0001' || (res.error.message && res.error.message.indexOf('maximum allowed')>-1)){
-              onDone(['इस मोबाइल नंबर से अधिकतम 3 RSVP पहले ही दर्ज हैं।', 'This mobile number already has 3 RSVP records (maximum allowed).']);
+              if(onDone)onDone(['इस मोबाइल नंबर से अधिकतम 3 RSVP पहले ही दर्ज हैं।', 'This mobile number already has 3 RSVP records (maximum allowed).']);
             }else{
-              onDone(['RSVP सहेजने में समस्या आई — कृपया पुनः प्रयास करें।', 'Could not save RSVP — please try again.']);
+              if(onDone)onDone(['RSVP सहेजने में समस्या आई — कृपया पुनः प्रयास करें।', 'Could not save RSVP — please try again.']);
             }
           }else{
-            onDone(null);
+            if(onDone)onDone(null);
           }
         });
       }, function(){
-        onDone(null);
+        if(onDone)onDone(null);
       });
     }
 
-    next.addEventListener('click',function(){
-      collect();var e=validate(step);if(e){showErr(e);return}showErr(null);
-      if(step===1){
-        setMyName(S.name);prefillNames();
-        if(S.att==='no'){
+    if(next){
+      next.addEventListener('click',function(){
+        collect();var e=validate(step);if(e){showErr(e);return}showErr(null);
+        if(step===1){
+          setMyName(S.name);prefillNames();
+          if(S.att==='no'){
+            next.disabled=true;
+            saveRsvpToSupabase(function(err){
+              next.disabled=false;
+              if(err){showErr(err);return}
+              S.done=true;S.joined=false;persist();record();
+              toast('धन्यवाद! कृपया अपना आशीर्वाद लिखें 🙏','Thank you! Please leave your wishes 🙏');
+              var w=$('wishes');if(w){smoothTo(w,'start');setTimeout(function(){var m=$('wh-msg');if(m)try{m.focus({preventScroll:true})}catch(x){}},700)}
+            });
+            return;
+          }
+          show(2);return;
+        }
+        if(step===2){show(3);return}
+        if(step===3){
           next.disabled=true;
           saveRsvpToSupabase(function(err){
             next.disabled=false;
             if(err){showErr(err);return}
-            S.done=true;S.joined=false;persist();record();
-            toast('धन्यवाद! कृपया अपना आशीर्वाद लिखें 🙏','Thank you! Please leave your wishes 🙏');
-            var w=$('wishes');if(w){smoothTo(w,'start');setTimeout(function(){var m=$('wh-msg');if(m)try{m.focus({preventScroll:true})}catch(x){}},700)}
+            S.done=true;S.grp=count();persist();record();buildStep4();show(4);
+            confetti(window.innerWidth/2, window.innerHeight/2);
+            toast('आपकी उपस्थिति दर्ज हो गई 🎉','RSVP saved 🎉');
           });
-          return;
         }
-        show(2);return;
-      }
-      if(step===2){show(3);return}
-      if(step===3){
-        next.disabled=true;
-        saveRsvpToSupabase(function(err){
-          next.disabled=false;
-          if(err){showErr(err);return}
-          S.done=true;S.grp=S.grp||1;persist();record();buildStep4();show(4);
-          confetti(window.innerWidth/2, window.innerHeight/2);
-          toast('आपकी उपस्थिति दर्ज हो गई 🎉','RSVP saved 🎉');
-        });
-      }
-    });
-    back.addEventListener('click',function(){if(step>1)show(step-1)});
-    $('rv-count').addEventListener('change',function(){$('rv-countx-w').hidden=(this.value!=='15+')});
-    $('rv-alldays').addEventListener('click',function(){setDays([12,13,15,16])});
-    $('rv-time').addEventListener('change',function(){if(this.value&&!radio('rv-slot'))setRadio('rv-slot',slotOf(this.value))});
+      });
+    }
+    if(back)back.addEventListener('click',function(){if(step>1)show(step-1)});
+    var rCount=$('rv-count');if(rCount)rCount.addEventListener('change',function(){var w=$('rv-countx-w');if(w)w.hidden=(this.value!=='15+')});
+    var rAllDays=$('rv-alldays');if(rAllDays)rAllDays.addEventListener('click',function(){setDays([12,13,15,16])});
+    var rTime=$('rv-time');if(rTime)rTime.addEventListener('change',function(){if(this.value&&!radio('rv-slot'))setRadio('rv-slot',slotOf(this.value))});
     form.addEventListener('submit',function(e){e.preventDefault()});
 
-    var gn=$('rv-grp-n');
-    function setGrp(v){var n=count();v=parseInt(v,10)||1;v=Math.max(1,Math.min(v,n));S.grp=v;gn.value=v;if(S.joined)record();persist();refreshLinks()}
-    $('rv-gm').addEventListener('click',function(){setGrp((parseInt(gn.value,10)||1)-1)});
-    $('rv-gp').addEventListener('click',function(){setGrp((parseInt(gn.value,10)||1)+1)});
-    gn.addEventListener('change',function(){setGrp(gn.value)});
-    $('rv-grp-btn').addEventListener('click',function(){S.joined=true;S.grp=Math.max(1,parseInt(gn.value,10)||1);record();persist();refreshLinks()});
-    $('rv-send').addEventListener('click',function(){refreshLinks()});
+    var grpBtn=$('rv-grp-btn');
+    if(grpBtn){
+      grpBtn.addEventListener('click', function(){
+        S.joined=true;
+        S.grp=count();
+        record();
+        persist();
+        saveRsvpToSupabase(function(){});
+      });
+    }
 
     /* VIP welcome pass (PNG) */
     function rr(x,a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath()}
@@ -442,25 +514,28 @@
       var fin=false;function go(){if(!fin){fin=true;cb()}}setTimeout(go,1800);
       try{if(DOC.fonts&&DOC.fonts.load){Promise.all([DOC.fonts.load('italic 500 40px "Cormorant Garamond"','Manisha'),DOC.fonts.load('400 30px "Tiro Devanagari Hindi"','मनीषा संग अतुल ॥ श्री गणेशाय नमः'),DOC.fonts.load('600 30px Mukta','VIP')]).then(go,go)}else go()}catch(e){go()}
     }
-    $('rv-pass-btn').addEventListener('click',function(){
-      collect();
-      loadFonts(function(){
-        var c=drawPass(),img=$('rv-pass-img');
-        try{img.src=c.toDataURL('image/png');$('rv-prev').hidden=false}catch(e){}
-        function save(b){
-          try{var url=URL.createObjectURL(b),a=el('a');a.href=url;a.download='VIP-Welcome-Pass-'+(S.name||'guest').replace(/[^\w\u0900-\u097F]+/g,'-').slice(0,30)+'.png';DOC.body.appendChild(a);a.click();DOC.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url)},4000)}catch(e){}
-        }
-        if(c.toBlob){c.toBlob(function(b){if(b)save(b)},'image/png')}
-        toast('आपका VIP पास तैयार है','Your VIP pass is ready');
+    var rPassBtn=$('rv-pass-btn');
+    if(rPassBtn){
+      rPassBtn.addEventListener('click',function(){
+        collect();
+        loadFonts(function(){
+          var c=drawPass(),img=$('rv-pass-img');
+          try{img.src=c.toDataURL('image/png');$('rv-prev').hidden=false}catch(e){}
+          function save(b){
+            try{var url=URL.createObjectURL(b),a=el('a');a.href=url;a.download='VIP-Welcome-Pass-'+(S.name||'guest').replace(/[^\w\u0900-\u097F]+/g,'-').slice(0,30)+'.png';DOC.body.appendChild(a);a.click();DOC.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url)},4000)}catch(e){}
+          }
+          if(c.toBlob){c.toBlob(function(b){if(b)save(b)},'image/png')}
+          toast('आपका VIP पास तैयार है','Your VIP pass is ready');
+        });
       });
-    });
+    }
 
     /* init */
     fill();
     if(S.done&&S.att==='yes'&&!validate(1)&&!validate(2)&&!validate(3)){buildStep4();show(4,true)}else show(1,true);
   })();
 
-  /* ---- wishes wall / guestbook: saved to Supabase; host-only retrieved archive ---- */
+  /* ---- wishes wall / guestbook: live Supabase sync + popup modal ---- */
   (function(){
     var f=$('wh-form');if(!f)return;
     var BADGE={ash:['🙏','आशीर्वाद','Ashirwad'],shub:['🌸','शुभकामनाएँ','Best Wishes'],love:['❤️','स्नेह','With Love'],bad:['🎉','बधाई','Congratulations']};
@@ -469,29 +544,50 @@
       ['आप दोनों को जीवन भर की खुशियाँ मिलें। ईश्वर का आशीर्वाद सदा आप पर बना रहे।','Wishing you a lifetime of happiness. God bless you both.'],
       ['सशरीर उपस्थित न हो पाने का खेद है, पर मेरा आशीर्वाद आप दोनों के साथ है।','Sorry I can’t be there in person, but my blessings are with you both.'],
       ['आपके साथ जश्न मनाने का इंतज़ार है! अमृतसर में मिलते हैं।','Can’t wait to celebrate with you! See you in Amritsar.']];
+
     var wishes=lsGet('wd-wishes',[]),mine=lsGet('wd-wlikes',{});
-    var list=$('wh-list'),empty=$('wh-empty'),err=$('wh-err'),share=$('wh-share'),fLocal=$('wh-fine-local'),fLive=$('wh-fine-live');
+    var list=$('wh-list'),modalList=$('wh-modal-list'),empty=$('wh-empty'),err=$('wh-err'),share=$('wh-share'),viewAllBtn=$('wh-view-all');
+    var modalCloseBtn=$('wh-modal-close'),modalBackBtn=$('wh-modal-back'),modalCount=$('wh-modal-count');
+
     WALL.get=function(){return wishes};
 
-    function setMode(live){
-      WALL.live=live;
-      if(fLocal)fLocal.hidden=live;
-      if(fLive)fLive.hidden=!live;
-    }
     function saveLocal(){lsSet('wd-wishes',wishes.slice(0,100));lsSet('wd-wlikes',mine)}
 
+    function buildWishCard(w){
+      var b=BADGE[w.b]||BADGE.ash,c=el('div','wcard'),h=el('div','wh'),who=el('div'),r=el('button','react');
+      who.appendChild(el('div','wn',w.n));if(w.c)who.appendChild(el('div','wc',w.c));
+      var bd=el('span','wb');bd.appendChild(el('span','',b[0]+' '));bd.appendChild(bi(b[1],b[2]));h.appendChild(who);h.appendChild(bd);
+      c.appendChild(h);c.appendChild(el('p','wm',w.m));
+      r.type='button';r.setAttribute('aria-pressed',mine[w.id]?'true':'false');
+      r.appendChild(el('span','','❤️'));r.appendChild(bi('आशीर्वाद','Ashirwad'));r.appendChild(el('span','',String(w.l||0)));
+      r.addEventListener('click',function(){like(w)});
+      c.appendChild(r);
+      return c;
+    }
+
     function render(){
-      list.textContent='';empty.hidden=wishes.length>0;
-      wishes.forEach(function(w){
-        var b=BADGE[w.b]||BADGE.ash,c=el('div','wcard'),h=el('div','wh'),who=el('div'),r=el('button','react');
-        who.appendChild(el('div','wn',w.n));if(w.c)who.appendChild(el('div','wc',w.c));
-        var bd=el('span','wb');bd.appendChild(el('span','',b[0]+' '));bd.appendChild(bi(b[1],b[2]));h.appendChild(who);h.appendChild(bd);
-        c.appendChild(h);c.appendChild(el('p','wm',w.m));
-        r.type='button';r.setAttribute('aria-pressed',mine[w.id]?'true':'false');
-        r.appendChild(el('span','','❤️'));r.appendChild(bi('आशीर्वाद','Ashirwad'));r.appendChild(el('span','',String(w.l||0)));
-        r.addEventListener('click',function(){like(w)});
-        c.appendChild(r);list.appendChild(c);
-      });
+      // Inline list: max 3 latest wishes
+      if(list){
+        list.textContent='';
+        var inlineItems=wishes.slice(0,3);
+        inlineItems.forEach(function(w){
+          list.appendChild(buildWishCard(w));
+        });
+      }
+      // Modal list: full archive
+      if(modalList){
+        modalList.textContent='';
+        wishes.forEach(function(w){
+          modalList.appendChild(buildWishCard(w));
+        });
+      }
+      if(empty)empty.hidden=wishes.length>0;
+
+      // Update count indicators
+      qa('.wh-cnt-txt').forEach(function(node){node.textContent=String(wishes.length)});
+      if(modalCount)modalCount.textContent='('+wishes.length+')';
+      if(viewAllBtn)viewAllBtn.hidden=(wishes.length<=3);
+
       if(WALL.onChange)WALL.onChange();
     }
 
@@ -500,19 +596,48 @@
       if(on)mine[w.id]=1;else delete mine[w.id];
       w.l=Math.max(0,(w.l||0)+(on?1:-1));
       saveLocal();render();
-      if(SBX.enabled){
+      if(SBX.enabled && w.id && w.id.indexOf('-')>-1){
         SBX.use(function(client){
-          if(w.id && w.id.indexOf('-')>-1){
-            client.rpc('increment_likes',{wish_id:w.id, delta:on?1:-1});
-          }
+          client.rpc('increment_likes',{wish_id:w.id, delta:on?1:-1});
         });
       }
     }
 
-    setMode(SBX.enabled);
-
-    function setErr(m){err.textContent='';if(m){err.appendChild(el('span','hi',m[0]));err.appendChild(el('span','en',m[1]))}}
+    function setErr(m){if(!err)return;err.textContent='';if(m){err.appendChild(el('span','hi',m[0]));err.appendChild(el('span','en',m[1]))}}
     qa('.pre',f).forEach(function(b){b.addEventListener('click',function(){var t=PRE[+b.getAttribute('data-i')];$('wh-msg').value=t[isHi()?0:1];setErr(null)})});
+
+    function loadSupabaseWishes(client){
+      client.from('wishes').select('*').order('created_at',{ascending:false}).limit(100).then(function(res){
+        if(res.data && res.data.length>=0){
+          wishes=res.data.map(function(r){
+            return {
+              id: r.id,
+              n: r.name,
+              c: r.city||'',
+              m: r.message,
+              b: r.badge||'ash',
+              l: r.likes||0,
+              ts: new Date(r.created_at).getTime()
+            };
+          });
+          saveLocal();
+          render();
+        }
+      });
+    }
+
+    if(SBX.enabled){
+      SBX.use(function(client){
+        loadSupabaseWishes(client);
+        try{
+          client.channel('public:wishes')
+            .on('postgres_changes', {event:'*', schema:'public', table:'wishes'}, function(){
+              loadSupabaseWishes(client);
+            })
+            .subscribe();
+        }catch(e){}
+      });
+    }
 
     f.addEventListener('submit',function(e){
       e.preventDefault();
@@ -535,19 +660,29 @@
             badge: bg,
             likes: 0
           }).then(function(res){
-            if(res.error){
-              toast('संदेश इस उपकरण पर सहेजा गया — पुनः प्रयास करें','Saved on device — try posting again to database');
-            }else{
-              toast('आपका आशीर्वाद परिवार तक पहुँच गया 🙏','Your blessing is saved for the family 🙏');
+            if(!res.error && client){
+              loadSupabaseWishes(client);
             }
           });
         });
       }
 
       $('wh-msg').value='';
-      share.href='https://wa.me/'+HOST_WA+'?text='+encodeURIComponent('Blessing from '+n+(c?' ('+c+')':'')+':\n'+m);share.hidden=false;
-      toast('आपका आशीर्वाद जुड़ गया 🙏','Your blessing is posted 🙏');
+      if(share){
+        share.href='https://wa.me/'+HOST_WA+'?text='+encodeURIComponent('Blessing from '+n+(c?' ('+c+')':'')+':\n'+m);
+        share.hidden=false;
+      }
+      toast('आपका आशीर्वाद परिवार तक पहुँच गया 🙏','Your blessing is saved for the family 🙏');
     });
+
+    if(viewAllBtn){
+      viewAllBtn.addEventListener('click',function(){
+        MODAL.open('wishes-modal', this);
+      });
+    }
+    if(modalCloseBtn) modalCloseBtn.addEventListener('click', function(){ MODAL.close('wishes-modal'); });
+    if(modalBackBtn) modalBackBtn.addEventListener('click', function(){ MODAL.close('wishes-modal'); });
+
     render();
   })();
 
@@ -562,23 +697,39 @@
       var s=inp?inp.value.toLowerCase().replace(/\s+/g,' ').trim():'',any=false;
       groups.forEach(function(g,gi){
         var vis=0;
-        qa('li',g).forEach(function(li){var ok=!s||li.getAttribute('data-s').indexOf(s)>-1;li.hidden=!ok;if(ok)vis++});
-        g.hidden=!((cur==='all'||+cur===gi)&&vis>0);if(!g.hidden)any=true;
+        qa('li',g).forEach(function(li){
+          var ok=!s||li.getAttribute('data-s').indexOf(s)>-1;
+          li.hidden=!ok;
+          if(ok)vis++;
+        });
+        // If searching with keyword, show all matching groups across categories.
+        // If search box is empty, adhere to selected filter chip.
+        var shouldShow = s ? (vis>0) : ((cur==='all'||+cur===gi)&&vis>0);
+        g.hidden=!shouldShow;
+        if(!g.hidden)any=true;
       });
       if(none)none.hidden=any;
     }
     if(inp)inp.addEventListener('input',apply);
-    chips.forEach(function(ch){ch.addEventListener('click',function(){cur=ch.getAttribute('data-f');chips.forEach(function(o){o.setAttribute('aria-pressed',o===ch?'true':'false')});apply()})});
+    chips.forEach(function(ch){
+      ch.addEventListener('click',function(){
+        cur=ch.getAttribute('data-f');
+        chips.forEach(function(o){o.setAttribute('aria-pressed',o===ch?'true':'false')});
+        apply();
+      });
+    });
   })();
 
   /* ---- Sangeet jukebox (shared via Supabase with realtime rankings & votes) ---- */
   (function(){
     var f=$('sg-form');if(!f)return;
     var live=false,pending=SBX.enabled;
-    var songs=lsGet('wd-songs',[]),mine=lsGet('wd-svotes',{}),list=$('sg-list'),empty=$('sg-empty'),err=$('sg-err'),fLocal=$('sg-fine-local'),fLive=$('sg-fine-live');
-    function setMode(){if(fLocal)fLocal.hidden=live||pending;if(fLive)fLive.hidden=!live}
+    var songs=lsGet('wd-songs',[]),mine=lsGet('wd-svotes',{});
+    var list=$('sg-list'),modalList=$('sg-modal-list'),empty=$('sg-empty'),err=$('sg-err'),viewAllBtn=$('sg-view-all');
+    var modalCloseBtn=$('sg-modal-close'),modalBackBtn=$('sg-modal-back'),modalCount=$('sg-modal-count');
+
     function save(){if(!live)lsSet('wd-songs',songs.slice(0,60));lsSet('wd-svotes',mine)}
-    function setErr(m){err.textContent='';if(m){err.appendChild(el('span','hi',m[0]));err.appendChild(el('span','en',m[1]))}}
+    function setErr(m){if(!err)return;err.textContent='';if(m){err.appendChild(el('span','hi',m[0]));err.appendChild(el('span','en',m[1]))}}
 
     function vote(s){
       var on=!mine[s.id];
@@ -598,19 +749,47 @@
       }
     }
 
+    function buildSongItem(s, idx){
+      var li=el('li','song'),inf=el('div','si'),r=el('button','react');
+      li.appendChild(el('div','rk',String(idx+1)));
+      inf.appendChild(el('div','st',s.t));
+      var meta=(s.a?s.a:'')+(s.a&&s.by?' · ':'')+(s.by?'🎤 '+s.by:'');if(meta)inf.appendChild(el('div','sa',meta));
+      li.appendChild(inf);
+      r.type='button';r.setAttribute('aria-pressed',mine[s.id]?'true':'false');
+      r.appendChild(el('span','','🔥'));r.appendChild(el('span','',String(s.v||0)));r.setAttribute('aria-label','Upvote');
+      r.addEventListener('click',function(){vote(s)});
+      li.appendChild(r);
+      return li;
+    }
+
     function render(){
       songs.sort(function(a,b){return (b.v||0)-(a.v||0)||(a.ts||0)-(b.ts||0)});
-      list.textContent='';empty.hidden=songs.length>0||pending;
-      songs.forEach(function(s,i){
-        var li=el('li','song'),inf=el('div','si'),r=el('button','react');
-        li.appendChild(el('div','rk',String(i+1)));
-        inf.appendChild(el('div','st',s.t));
-        var meta=(s.a?s.a:'')+(s.a&&s.by?' · ':'')+(s.by?'🎤 '+s.by:'');if(meta)inf.appendChild(el('div','sa',meta));
-        li.appendChild(inf);
-        r.type='button';r.setAttribute('aria-pressed',mine[s.id]?'true':'false');r.appendChild(el('span','','🔥'));r.appendChild(el('span','',String(s.v||0)));r.setAttribute('aria-label','Upvote');
-        r.addEventListener('click',function(){vote(s)});
-        li.appendChild(r);list.appendChild(li);
-      });
+      if(empty)empty.hidden=songs.length>0||pending;
+
+      // Inline list: Top 5 songs
+      if(list){
+        list.textContent='';
+        var inlineSongs=songs.slice(0,5);
+        inlineSongs.forEach(function(s,i){
+          list.appendChild(buildSongItem(s, i));
+        });
+      }
+
+      // Modal list: full leaderboard
+      if(modalList){
+        modalList.textContent='';
+        songs.forEach(function(s,i){
+          modalList.appendChild(buildSongItem(s, i));
+        });
+      }
+
+      // Update count indicators
+      var countTotal=songs.length;
+      var cHi=$('sg-total-count'),cEn=$('sg-total-count-en');
+      if(cHi)cHi.textContent=String(countTotal);
+      if(cEn)cEn.textContent=String(countTotal);
+      if(modalCount)modalCount.textContent='('+countTotal+')';
+      if(viewAllBtn)viewAllBtn.hidden=(countTotal<=5);
     }
 
     function loadSupabaseSongs(client){
@@ -621,17 +800,14 @@
           songs=res.data.map(function(r){
             return {id:r.id, t:r.title, a:r.artist||'', by:r.requested_by||'', v:r.votes||0, ts:new Date(r.created_at).getTime()};
           });
-          setMode();
           render();
         }else{
           live=false;
-          setMode();
           render();
         }
       });
     }
 
-    setMode();
     if(SBX.enabled){
       SBX.use(function(client){
         loadSupabaseSongs(client);
@@ -643,7 +819,7 @@
             .subscribe();
         }catch(e){}
       }, function(){
-        pending=false;live=false;setMode();render();
+        pending=false;live=false;render();
       });
     }
 
@@ -679,6 +855,15 @@
       }
       $('sg-t').value='';$('sg-a').value='';
     });
+
+    if(viewAllBtn){
+      viewAllBtn.addEventListener('click',function(){
+        MODAL.open('songs-modal', this);
+      });
+    }
+    if(modalCloseBtn) modalCloseBtn.addEventListener('click', function(){ MODAL.close('songs-modal'); });
+    if(modalBackBtn) modalBackBtn.addEventListener('click', function(){ MODAL.close('songs-modal'); });
+
     render();
   })();
 
@@ -746,7 +931,7 @@
   /* ---- secured host panel (triple-tap the footer; protected by passcode) ---- */
   (function(){
     var foot=q('.foot'),box=$('admin');if(!foot||!box)return;
-    var nameI=$('ad-name'),linkI=$('ad-link'),waA=$('ad-wa'),opener=null,taps=[];
+    var nameI=$('ad-name'),linkI=$('ad-link'),waA=$('ad-wa'),taps=[];
     var authPasscode=sessionStorage.getItem('wd-ad-auth')||'';
 
     var loginDiv=$('ad-login'), bodyDiv=$('ad-body'), pwdI=$('ad-pwd'), unlockBtn=$('ad-unlock'), authErr=$('ad-err'), logoutBtn=$('ad-logout');
@@ -778,13 +963,11 @@
     function loadHostData(){
       if(SBX.enabled && authPasscode){
         SBX.use(function(client){
-          // Fetch live RSVPs securely via host_get_rsvps RPC
           client.rpc('host_get_rsvps', {passcode: authPasscode}).then(function(res){
             if(res.data && !res.error){
               renderStats(res.data);
             }
           });
-          // Fetch live wishes securely via host_get_wishes RPC
           client.rpc('host_get_wishes', {passcode: authPasscode}).then(function(res){
             if(res.data && !res.error){
               var items=res.data.map(function(w){
@@ -795,7 +978,6 @@
           });
         });
       }else{
-        // Local device fallback
         var all=lsGet('wd-rsvps',{}),ks=Object.keys(all),list=[];
         ks.forEach(function(k){list.push(all[k])});
         renderStats(list);
@@ -814,12 +996,12 @@
     }
     function renderWishes(a, isLive){
       currentWishesList=a||[];
-      wc.textContent=currentWishesList.length;wl.textContent='';
+      if(wc)wc.textContent=currentWishesList.length;if(wl)wl.textContent='';
       if(wLive)wLive.hidden=!isLive;if(wLocal)wLocal.hidden=!!isLive;
       currentWishesList.forEach(function(w){
         var li=el('li'),h=el('div','awh');h.appendChild(el('b','',w.n));
         var meta=[w.c,fmtWhen(w.ts)].filter(Boolean).join(' · ');if(meta)h.appendChild(el('span','',meta));
-        li.appendChild(h);li.appendChild(el('p','awm',w.m));wl.appendChild(li);
+        li.appendChild(h);li.appendChild(el('p','awm',w.m));if(wl)wl.appendChild(li);
       });
     }
 
@@ -836,18 +1018,24 @@
       return currentWishesList.slice().reverse().map(function(w){return w.n+(w.c?' ('+w.c+')':'')+': '+w.m}).join('\n\n');
     }
 
-    $('ad-wcsv').addEventListener('click',function(){
-      if(!currentWishesList.length){toast('अभी कोई आशीर्वाद नहीं','No wishes yet');return}
-      try{
-        var b=new Blob(['\ufeff'+csvText()],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(b),a=el('a');
-        a.href=url;a.download='guestbook-wishes.csv';DOC.body.appendChild(a);a.click();DOC.body.removeChild(a);
-        setTimeout(function(){URL.revokeObjectURL(url)},4000);
-      }catch(e){toast('डाउनलोड नहीं हो सका — "सब कॉपी करें" दबाएँ','Download failed — try Copy all')}
-    });
-    $('ad-wcopy').addEventListener('click',function(){
-      if(!currentWishesList.length){toast('अभी कोई आशीर्वाद नहीं','No wishes yet');return}
-      copyText(plainText(),function(ok){ok?toast('सभी आशीर्वाद कॉपी हो गए','All wishes copied'):toast('कॉपी नहीं हो सका','Couldn’t copy')});
-    });
+    var adWcsv=$('ad-wcsv');
+    if(adWcsv){
+      adWcsv.addEventListener('click',function(){
+        if(!currentWishesList.length){toast('अभी कोई आशीर्वाद नहीं','No wishes yet');return}
+        try{
+          var b=new Blob(['\ufeff'+csvText()],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(b),a=el('a');
+          a.href=url;a.download='guestbook-wishes.csv';DOC.body.appendChild(a);a.click();DOC.body.removeChild(a);
+          setTimeout(function(){URL.revokeObjectURL(url)},4000);
+        }catch(e){toast('डाउनलोड नहीं हो सका — "सब कॉपी करें" दबाएँ','Download failed — try Copy all')}
+      });
+    }
+    var adWcopy=$('ad-wcopy');
+    if(adWcopy){
+      adWcopy.addEventListener('click',function(){
+        if(!currentWishesList.length){toast('अभी कोई आशीर्वाद नहीं','No wishes yet');return}
+        copyText(plainText(),function(ok){ok?toast('सभी आशीर्वाद कॉपी हो गए','All wishes copied'):toast('कॉपी नहीं हो सका','Couldn’t copy')});
+      });
+    }
 
     function setViewState(authed){
       if(loginDiv && bodyDiv){
@@ -882,7 +1070,6 @@
           });
         }, function(){
           if(unlockBtn)unlockBtn.disabled=false;
-          // Fallback if offline: allow device local view
           setViewState(true);
         });
       }else{
@@ -901,8 +1088,8 @@
       setViewState(false);
     });
 
-    function open(){
-      opener=DOC.activeElement;box.hidden=false;DOC.body.style.overflow='hidden';
+    function openAdmin(){
+      MODAL.open('admin', foot);
       upd();applyLang();
       if(authPasscode){
         setViewState(true);
@@ -911,21 +1098,69 @@
         if(pwdI)setTimeout(function(){pwdI.focus()},50);
       }
     }
-    function close(){box.hidden=true;DOC.body.style.overflow='';if(opener&&opener.focus)try{opener.focus()}catch(e){}}
 
-    foot.addEventListener('click',function(){var n=Date.now();taps.push(n);taps=taps.filter(function(t){return n-t<900});if(taps.length>=3){taps=[];open()}});
-    $('ad-close').addEventListener('click',close);
-    box.addEventListener('click',function(e){if(e.target===box)close()});
-    DOC.addEventListener('keydown',function(e){
-      if(box.hidden)return;
-      if(e.key==='Escape'){close();return}
-      if(e.key==='Tab'){var f=qa('button,input,a[href]',box).filter(function(n){return !n.disabled&&n.offsetParent!==null});if(!f.length)return;var a=f[0],z=f[f.length-1];
-        if(e.shiftKey&&DOC.activeElement===a){e.preventDefault();z.focus()}else if(!e.shiftKey&&DOC.activeElement===z){e.preventDefault();a.focus()}}
-    });
-    nameI.addEventListener('input',upd);
-    $('ad-copy').addEventListener('click',function(){copyText(linkI.value,function(ok){ok?toast('लिंक कॉपी हो गया','Link copied'):(linkI.select(),toast('लिंक चुना गया — कॉपी करें','Link selected — please copy it'))})});
-    $('ad-reset').addEventListener('click',function(){
+    foot.addEventListener('click',function(){var n=Date.now();taps.push(n);taps=taps.filter(function(t){return n-t<900});if(taps.length>=3){taps=[];openAdmin()}});
+    var adClose=$('ad-close');if(adClose)adClose.addEventListener('click',function(){MODAL.close('admin')});
+    if(nameI)nameI.addEventListener('input',upd);
+    var adCopy=$('ad-copy');if(adCopy)adCopy.addEventListener('click',function(){copyText(linkI.value,function(ok){ok?toast('लिंक कॉपी हो गया','Link copied'):(linkI.select(),toast('लिंक चुना गया — कॉपी करें','Link selected — please copy it'))})});
+    var adReset=$('ad-reset');if(adReset)adReset.addEventListener('click',function(){
       if(window.confirm('Reset RSVP data stored on this device? / इस उपकरण का RSVP डेटा मिटाएँ?')){try{localStorage.removeItem('wd-rsvps');localStorage.removeItem('wd-rsvp-me')}catch(e){}loadHostData();toast('डेटा मिटा दिया गया','Data cleared — reload to reset the form')}
+    });
+  })();
+
+  /* ---- Mobile App Shell Bottom Navigation Bar & Smooth Scroll ---- */
+  (function(){
+    var bnav = $('bnav');
+    var items = bnav ? qa('.bnav-item', bnav) : [];
+    var secIds = ['events', 'venue', 'rsvp', 'jukebox', 'wishes'];
+    var secs = secIds.map(function(id){ return $(id); }).filter(Boolean);
+
+    function setActive(id){
+      items.forEach(function(item){
+        var match = item.getAttribute('data-sec') === id;
+        item.classList.toggle('active', match);
+      });
+    }
+
+    if('IntersectionObserver' in window && secs.length){
+      var obs = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          if(entry.isIntersecting){
+            setActive(entry.target.id);
+          }
+        });
+      }, {
+        rootMargin: '-20% 0px -50% 0px',
+        threshold: 0
+      });
+      secs.forEach(function(sec){ obs.observe(sec); });
+    }
+
+    // Smooth scroll for nav items
+    items.forEach(function(item){
+      item.addEventListener('click', function(e){
+        var secId = item.getAttribute('data-sec');
+        var target = $(secId);
+        if(target){
+          e.preventDefault();
+          smoothTo(target, 'start');
+          setActive(secId);
+        }
+      });
+    });
+
+    // Smooth scroll for hero action pills
+    qa('.hero-pill').forEach(function(pill){
+      pill.addEventListener('click', function(e){
+        var href = pill.getAttribute('href');
+        if(href && href.charAt(0) === '#'){
+          var target = $(href.slice(1));
+          if(target){
+            e.preventDefault();
+            smoothTo(target, 'start');
+          }
+        }
+      });
     });
   })();
 
