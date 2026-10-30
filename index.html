@@ -12,7 +12,11 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<audio id="bg-music" src="bg-music.mpeg" loop preload="auto" autoplay></audio>
+<audio id="bg-music" loop preload="auto" playsinline autoplay>
+  <source src="bg-music.mpeg" type="audio/mpeg">
+  <source src="Bg-music.mpeg" type="audio/mpeg">
+  <source src="bg-music.mp3" type="audio/mpeg">
+</audio>
 
 <input class="rl" type="radio" name="lang" id="r-hi" checked aria-label="हिन्दी">
 <input class="rl" type="radio" name="lang" id="r-en" aria-label="English">

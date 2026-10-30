@@ -148,74 +148,100 @@
       }
     });
 
-    // Default playing state: unmuted and active unless explicitly muted in active session
-    var isMuted = sessionStorage.getItem('wd-music-mute') === 'true';
+    // Default: Always Music ON (userMuted = false on every fresh load)
+    // Do NOT read or persist mute state in localStorage or sessionStorage
+    var userMuted = false;
 
     function updateMusicUI(){
       if(!musicBtn) return;
-      musicBtn.classList.toggle('muted', isMuted);
-      if(mIcon) mIcon.textContent = isMuted ? '🔇' : '🔊';
-      musicBtn.setAttribute('aria-label', isMuted ? 'Unmute background music' : 'Mute background music');
+      musicBtn.classList.toggle('muted', userMuted);
+      if(mIcon) mIcon.textContent = userMuted ? '🔇' : '🔊';
+      musicBtn.setAttribute('aria-label', userMuted ? 'Unmute background music' : 'Mute background music');
     }
 
-    function playMusic(){
-      if(!audio || isMuted) return;
+    var gestureEvents = ['click', 'touchend', 'pointerup', 'keydown', 'touchstart'];
+    var listenersAttached = false;
+
+    function removeGestureListeners(){
+      if(!listenersAttached) return;
+      gestureEvents.forEach(function(evt){
+        window.removeEventListener(evt, onUserGesture, { capture: true });
+        DOC.removeEventListener(evt, onUserGesture, { capture: true });
+      });
+      listenersAttached = false;
+    }
+
+    function addGestureListeners(){
+      if(listenersAttached) return;
+      gestureEvents.forEach(function(evt){
+        window.addEventListener(evt, onUserGesture, { capture: true, passive: true });
+        DOC.addEventListener(evt, onUserGesture, { capture: true, passive: true });
+      });
+      listenersAttached = true;
+    }
+
+    function attemptPlay(){
+      if(userMuted || !audio) return;
       audio.muted = false;
       var p = audio.play();
-      if(p && p.catch){
-        p.catch(function(){ /* waiting for user gesture */ });
+      if(p && p.then){
+        p.then(function(){
+          if(!audio.paused){
+            removeGestureListeners();
+          }
+        }).catch(function(){
+          // Autoplay blocked by browser pending user gesture.
+          // Keep gesture listeners active; NEVER set userMuted=true or switch icon to mute!
+          if(!userMuted){
+            addGestureListeners();
+          }
+        });
       }
     }
 
-    function pauseMusic(){
-      if(audio) audio.pause();
+    function onUserGesture(e){
+      if(userMuted || !audio) return;
+      if(!audio.paused){
+        removeGestureListeners();
+        return;
+      }
+      attemptPlay();
     }
 
-    // Initialize UI according to current session mute state
+    // Set UI to Music ON (🔊) immediately on load
     updateMusicUI();
 
-    // Play by default on open: attempt immediately on load
-    if(!isMuted){
-      playMusic();
-      var unlockAudio = function(){
-        if(!isMuted && audio && audio.paused){
-          playMusic();
-        }
-      };
-      // Passive one-time listeners on touchstart, pointerdown, scroll, and click
-      ['touchstart', 'pointerdown', 'scroll', 'click'].forEach(function(evt){
-        window.addEventListener(evt, unlockAudio, { once: true, passive: true });
-        DOC.addEventListener(evt, unlockAudio, { once: true, passive: true });
-      });
-    }
+    // Attempt immediate play on load & attach gesture listeners until it succeeds
+    attemptPlay();
+    addGestureListeners();
 
-    // Active webapp lifecycle (pause on tab switch / lock, resume on return)
+    // Active webapp lifecycle (pause on tab switch / lock, resume on return if not userMuted)
     DOC.addEventListener('visibilitychange', function(){
       if(DOC.hidden){
         if(audio && !audio.paused) audio.pause();
       } else {
-        if(!isMuted && audio && audio.paused) playMusic();
+        if(!userMuted && audio && audio.paused) attemptPlay();
       }
     });
     window.addEventListener('pagehide', function(){
       if(audio && !audio.paused) audio.pause();
     });
 
-    // Top toggle button
+    // Top toggle button (manual user mute/unmute)
     if(musicBtn){
-      musicBtn.addEventListener('click', function(){
-        if(isMuted){
-          isMuted = false;
-          sessionStorage.setItem('wd-music-mute', 'false');
+      musicBtn.addEventListener('click', function(e){
+        if(e && e.stopPropagation) e.stopPropagation();
+        if(userMuted){
+          userMuted = false;
           updateMusicUI();
-          playMusic();
+          attemptPlay();
         } else {
-          isMuted = true;
-          sessionStorage.setItem('wd-music-mute', 'true');
+          userMuted = true;
           updateMusicUI();
-          pauseMusic();
+          if(audio) audio.pause();
+          removeGestureListeners();
         }
-      });
+      }, { capture: true });
     }
   })();
 
