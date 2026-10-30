@@ -12,15 +12,13 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<audio id="bg-music" src="bg-music.mpeg" loop preload="auto"></audio>
+<audio id="bg-music" src="bg-music.mpeg" loop preload="auto" autoplay></audio>
 
 <input class="rl" type="radio" name="lang" id="r-hi" checked aria-label="हिन्दी">
 <input class="rl" type="radio" name="lang" id="r-en" aria-label="English">
 <div class="top-bar">
-  <button type="button" class="music-btn" id="music-btn" aria-label="Toggle background music">
+  <button type="button" class="music-btn" id="music-btn" aria-label="Mute background music">
     <span class="m-icon" id="m-icon" aria-hidden="true">🔊</span>
-    <span class="m-text on-text"><span class="hi">संगीत चालू</span><span class="en">Music On</span></span>
-    <span class="m-text off-text" hidden><span class="hi">संगीत बंद</span><span class="en">Muted</span></span>
   </button>
   <div class="lang" role="group" aria-label="Language">
     <label for="r-hi" class="lb-hi">हिन्दी</label>
@@ -37,10 +35,6 @@
       <p class="shloka">ॐ वक्रतुण्ड महाकाय सूर्यकोटि समप्रभः।<br>निर्विघ्नं कुरु मे देव सर्वकार्येषु सर्वदा॥</p>
       <h1 class="names"><span class="hi">मनीषा<small>संग</small>अतुल</span><span class="en">Manisha<small>weds</small>Atul</span></h1>
       <p class="when"><span class="hi">16 नवंबर 2026</span><span class="en">16 November 2026</span><span class="l"><i class="hi" style="font-style:normal">विवाह निमंत्रण</i><i class="en" style="font-style:normal">Wedding Invitation</i></span></p>
-      <div class="hero-actions">
-        <a class="hero-pill primary" href="#rsvp"><span class="hi">उपस्थिति दर्ज करें</span><span class="en">RSVP Now</span></a>
-        <a class="hero-pill" href="#events"><span class="hi">स्थल व कार्यक्रम</span><span class="en">Venues &amp; Schedule</span></a>
-      </div>
     </div>
     <a class="cue" href="#blessing"><span class="hi">नीचे देखें</span><span class="en">Scroll</span></a>
   </header>
@@ -262,7 +256,7 @@
         <h3 class="vnm"><span class="hi">आरआरवी होटल</span><span class="en">RRV HOTEL</span></h3>
         <p class="vaddr"><span class="hi">20-M, संत नगर, अमृतसर कैंट, पंजाब 143006</span><span class="en">20-M, Sant Nagar, Amritsar Cantt., Punjab 143006</span></p>
         <div class="vbtns">
-          <a class="btn" href="https://maps.app.goo.gl/ufRcFq37vHwnVugLA" target="_blank" rel="noopener"><span class="hi">मैप में खोलें</span><span class="en">Open in Maps</span></a>
+          <a class="btn venue-map-btn" href="https://maps.app.goo.gl/ufRcFq37vHwnVugLA" target="_blank" rel="noopener"><span class="m-pin" aria-hidden="true">📍</span> <span class="hi">मैप में खोलें</span><span class="en">Open in Maps</span></a>
         </div>
       </div>
 
@@ -272,7 +266,7 @@
         <h3 class="vnm"><span class="hi">ला फिएस्टा रिसॉर्ट</span><span class="en">La Fiesta Resort</span></h3>
         <p class="vaddr"><span class="hi">आर्मी गेट नंबर 6 के सामने, खासा के पास, अटारी रोड, अमृतसर</span><span class="en">Opp. Army Gate No. 6, Near Khasa, Attari Road, Amritsar</span></p>
         <div class="vbtns">
-          <a class="btn" href="https://maps.app.goo.gl/S8MWM9zmoM6V7YVHA?g_st=ac" target="_blank" rel="noopener"><span class="hi">मैप में खोलें</span><span class="en">Open in Maps</span></a>
+          <a class="btn venue-map-btn" href="https://maps.app.goo.gl/S8MWM9zmoM6V7YVHA?g_st=ac" target="_blank" rel="noopener"><span class="m-pin" aria-hidden="true">📍</span> <span class="hi">मैप में खोलें</span><span class="en">Open in Maps</span></a>
         </div>
       </div>
 
@@ -282,7 +276,7 @@
         <h3 class="vnm"><span class="hi">फ्रीडम ग्रैंड</span><span class="en">Freedom Grand</span></h3>
         <p class="vaddr"><span class="hi">जी टी रोड, नेक्सस मॉल के सामने, अमृतसर</span><span class="en">G T Road, Opposite Nexus Mall, Amritsar</span></p>
         <div class="vbtns">
-          <a class="btn" href="https://maps.app.goo.gl/oVNwf2GPz8y5rHt67?g_st=ac" target="_blank" rel="noopener"><span class="hi">मैप में खोलें</span><span class="en">Open in Maps</span></a>
+          <a class="btn venue-map-btn" href="https://maps.app.goo.gl/oVNwf2GPz8y5rHt67?g_st=ac" target="_blank" rel="noopener"><span class="m-pin" aria-hidden="true">📍</span> <span class="hi">मैप में खोलें</span><span class="en">Open in Maps</span></a>
         </div>
       </div>
     </div>
