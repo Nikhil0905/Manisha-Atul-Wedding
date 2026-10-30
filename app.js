@@ -139,6 +139,7 @@
 
     // Default volume: medium-low (0.25)
     audio.volume = 0.25;
+    audio.muted = false;
 
     // Glitch skip (03:12 – 03:34): if between 191.5s and 215s, jump directly to 215s
     audio.addEventListener('timeupdate', function(){
@@ -147,32 +148,33 @@
       }
     });
 
+    // Default playing state: unmuted and active unless explicitly muted in active session
     var isMuted = sessionStorage.getItem('wd-music-mute') === 'true';
 
-    function updateMusicUI(playing){
+    function updateMusicUI(){
       if(!musicBtn) return;
-      var active = playing && !isMuted;
-      musicBtn.classList.toggle('muted', !active);
-      if(mIcon) mIcon.textContent = active ? '🔊' : '🔇';
-      var onText = q('.on-text', musicBtn), offText = q('.off-text', musicBtn);
-      if(onText) onText.hidden = !active;
-      if(offText) offText.hidden = active;
-      musicBtn.setAttribute('aria-label', active ? 'Mute background music' : 'Play background music');
+      musicBtn.classList.toggle('muted', isMuted);
+      if(mIcon) mIcon.textContent = isMuted ? '🔇' : '🔊';
+      musicBtn.setAttribute('aria-label', isMuted ? 'Unmute background music' : 'Mute background music');
     }
 
     function playMusic(){
       if(!audio || isMuted) return;
+      audio.muted = false;
       var p = audio.play();
-      if(p && p.then){
-        p.then(function(){ updateMusicUI(true); }).catch(function(){ updateMusicUI(false); });
+      if(p && p.catch){
+        p.catch(function(){ /* waiting for user gesture */ });
       }
     }
 
     function pauseMusic(){
-      if(audio){ audio.pause(); updateMusicUI(false); }
+      if(audio) audio.pause();
     }
 
-    // Autoplay attempt on load & first-interaction unlock
+    // Initialize UI according to current session mute state
+    updateMusicUI();
+
+    // Play by default on open: attempt immediately on load
     if(!isMuted){
       playMusic();
       var unlockAudio = function(){
@@ -180,11 +182,11 @@
           playMusic();
         }
       };
-      ['pointerdown', 'touchstart', 'click', 'keydown'].forEach(function(evt){
+      // Passive one-time listeners on touchstart, pointerdown, scroll, and click
+      ['touchstart', 'pointerdown', 'scroll', 'click'].forEach(function(evt){
+        window.addEventListener(evt, unlockAudio, { once: true, passive: true });
         DOC.addEventListener(evt, unlockAudio, { once: true, passive: true });
       });
-    } else {
-      updateMusicUI(false);
     }
 
     // Active webapp lifecycle (pause on tab switch / lock, resume on return)
@@ -205,10 +207,12 @@
         if(isMuted){
           isMuted = false;
           sessionStorage.setItem('wd-music-mute', 'false');
+          updateMusicUI();
           playMusic();
         } else {
           isMuted = true;
           sessionStorage.setItem('wd-music-mute', 'true');
+          updateMusicUI();
           pauseMusic();
         }
       });
@@ -1304,20 +1308,6 @@
           e.preventDefault();
           smoothTo(target, 'start');
           setActive(secId);
-        }
-      });
-    });
-
-    // Smooth scroll for hero action pills
-    qa('.hero-pill').forEach(function(pill){
-      pill.addEventListener('click', function(e){
-        var href = pill.getAttribute('href');
-        if(href && href.charAt(0) === '#'){
-          var target = $(href.slice(1));
-          if(target){
-            e.preventDefault();
-            smoothTo(target, 'start');
-          }
         }
       });
     });
