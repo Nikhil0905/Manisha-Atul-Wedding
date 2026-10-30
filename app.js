@@ -3,9 +3,10 @@
   function $(i){return document.getElementById(i)}
   var rh=$('r-hi'),re=$('r-en');
   function isHi(){return !(re&&re.checked)}
-  try{var sv=localStorage.getItem('wd-lang'); if(sv==='en'&&re){re.checked=true}}catch(e){}
+  try{var sv=localStorage.getItem('wd-lang'); if(sv==='en'&&re){re.checked=true}else if(sv==='hi'&&rh){rh.checked=true}}catch(e){}
   function onLang(){try{localStorage.setItem('wd-lang',isHi()?'hi':'en')}catch(e){} document.documentElement.lang=isHi()?'hi':'en'; tick()}
   try{rh.addEventListener('change',onLang);re.addEventListener('change',onLang);rh.addEventListener('click',onLang);re.addEventListener('click',onLang)}catch(e){}
+  onLang();
 
   // wedding: 16 Nov 2026, Barat 8 PM IST = 14:30 UTC
   var target=Date.UTC(2026,10,16,14,30,0);
@@ -153,6 +154,7 @@
     qa('[data-t-hi]').forEach(function(n){n.textContent=n.getAttribute(hi?'data-t-hi':'data-t-en')});
   }
   ['r-hi','r-en'].forEach(function(id){var n=$(id);if(n){n.addEventListener('change',applyLang);n.addEventListener('click',applyLang)}});
+  applyLang();
 
   /* ---- particle engine (confetti + petals) ---- */
   function makeFx(cv,full){
