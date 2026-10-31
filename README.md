@@ -1,13 +1,13 @@
-# Manisha & Atul — Wedding Web App
+# Wedding Web App
 
-A production-ready, bilingual wedding web app built to solve real-world guest coordination and logistics for an Indian wedding (~500 guests). 
+A production-ready, bilingual wedding web app that solves real-world guest coordination and logistics for an Indian wedding. 
 
 🌐 **Live Website:** [nikhil0905.github.io/Manisha-Atul-Wedding](https://nikhil0905.github.io/Manisha-Atul-Wedding/)
 
 ---
 
-## 💡 Why I Built This
-Traditional wedding invitations leave families juggling phone calls, WhatsApp messages, and messy spreadsheets to figure out who is coming, when they arrive, and how they're travelling. 
+## Why I Built This
+Traditional wedding invitations leave families juggling phone calls, WhatsApp messages, and messy spreadsheets to figure out who is coming, when they'll arrive, and how they'll travel. 
 
 I built this project to streamline that entire process into a single, clean link. 
 
@@ -17,13 +17,13 @@ I built this project to streamline that entire process into a single, clean link
 
 ---
 
-## ✨ Key Features
+## Key Features
 
 ### For Guests
 - **Bilingual Support:** One-tap toggle between English and Hindi with saved preference.
 - **Smart RSVP Flow:** Multi-step wizard capturing guest count, attending ceremonies, and travel logistics (dynamically asks for Flight or Train numbers when relevant).
 - **Interactive Celebrations:**
-  - **Pushp Varsha:** Live petal shower synced in real-time across active visitors.
+  - **Pushp Varsha:** Live petal shower synced in real time across active visitors.
   - **Sangeet Jukebox:** Guests submit song requests and upvote favorites.
   - **Floating Diyas & Guestbook:** Leave blessings and virtual floating candles.
 - **Seamless Music:** Background wedding shehnai/instrumental audio tuned to work reliably across mobile devices, including iOS Safari.
@@ -37,7 +37,7 @@ I built this project to streamline that entire process into a single, clean link
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 - **Frontend:** Pure Vanilla HTML5, CSS3, JavaScript (zero external framework bloat, fast mobile load).
 - **Database & Realtime:** [Supabase](https://supabase.com/) (PostgreSQL with Row Level Security and Realtime channels).
 - **Hosting:** GitHub Pages.
@@ -46,4 +46,4 @@ I built this project to streamline that entire process into a single, clean link
 ---
 
 ## 👤 Author
-Built with ❤️ for family by Nikhil.
+Built with ❤️ for family.
