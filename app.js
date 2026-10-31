@@ -137,9 +137,12 @@
     var audio=$('bg-music'), musicBtn=$('music-btn'), mIcon=$('m-icon');
     if(!audio)return;
 
-    // Default volume: medium-low (0.25)
-    audio.volume = 0.25;
+    // Volume configuration (medium-low 0.25; wrapped in try-catch for iOS Safari where volume is read-only)
+    try { audio.volume = 0.25; } catch(e){}
     audio.muted = false;
+
+    // Prepare media pipeline
+    try { audio.load(); } catch(e){}
 
     // Glitch skip (03:12 – 03:34): if between 191.5s and 215s, jump directly to 215s
     audio.addEventListener('timeupdate', function(){
@@ -159,7 +162,9 @@
       musicBtn.setAttribute('aria-label', on ? 'Mute background music' : 'Play background music');
     }
 
-    var gestureEvents = ['touchstart', 'touchend', 'pointerdown', 'pointerup', 'click', 'keydown', 'scroll'];
+    // iOS WebKit strictly requires true user activation events (touchend, click, pointerup).
+    // Note: 'scroll' and 'touchstart' are NOT user activation gestures in iOS Safari and calling play() on them throws NotAllowedError.
+    var gestureEvents = ['touchend', 'click', 'pointerup', 'keydown'];
     var listenersAttached = false;
 
     function removeGestureListeners(){
